@@ -29,7 +29,9 @@ This document outlines how ACME can be used by a client to obtain a certificate 
 
 # Introduction
 
-ACME {{?RFC8555}} defines a protocol that a certificate authority (CA) and an applicant can use to automate the process of domain name ownership validation and X.509 (PKIX) certificate issuance. The protocol is rich and flexible and enables multiple use cases that are not immediately obvious from reading the specification. This document explicitly outlines how ACME can be used to issue subdomain certificates, without requiring the ACME client to explicitly fulfill an ownership challenge against the subdomain identifiers - the ACME client need only fulfill an ownership challenge against a parent domain identifier.
+ACME {{?RFC8555}} defines a protocol that a certificate authority (CA) and an applicant can use to automate the process of domain name ownership validation and X.509 (PKIX) certificate issuance. The protocol is rich and flexible and enables multiple use cases that are not immediately obvious from reading the specification.
+
+This document explicitly outlines how ACME can be used to issue subdomain certificates, without requiring the ACME client to explicitly fulfill an ownership challenge against the subdomain identifiers - the ACME client need only fulfill an ownership challenge against a parent domain identifier.
 
 # Terminology
 
@@ -44,13 +46,9 @@ The following terms are used in this document:
 
 - CA: Certificate Authority
 
-- CMC: Certificate Management over CMS
-
 - CSR: Certificate Signing Request
 
 - FQDN: Fully Qualified Domain Name
-
-- RA: PKI Registration Authority
 
 # ACME Workflow and Identifier Requirements
 
@@ -76,13 +74,17 @@ ACME places the following restrictions on "identifiers":
 
 - Section 8.4: the "identifier", or FQDN, in the "authorization" object must be used when fulfilling challenges via DNS: "The client constructs the validation domain name by prepending the label "_acme-challenge" to the domain name being validated."
 
-ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain. ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for the parent domain.
+ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects.
 
 # ACME Issuance of Subdomain Certificates
 
-This allows a flow where a client proves ownership of "domain.com" and then successfully obtains a certificate for "sub.domain.com". The ACME pre-authorization flow makes most sense for this use case, and that is what is illustrated in the following call flow.
+As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain. ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for the parent domain.
+
+This allows a flow where a client proves ownership of, for example, "example.com" and then successfully obtains a certificate for "sub.example.com". The ACME pre-authorization flow makes most sense for this use case, and that is what is illustrated in the following call flow.
 
 The client could pre-authorize for the parent domain once, and then issue multiple newOrder requests for certificates for multiple subdomains. This call flow illustrates the client only placing one newOrder request.
+
+The call flow illustrates the DNS-based proof of ownershp mechanism, but the subdomain workflow is equally valid for HTTP based proof of ownership.
 
 ~~~
 
@@ -93,14 +95,14 @@ The client could pre-authorize for the parent domain once, and then issue multip
  STEP 1: Pre-Authorization of parent domain
     |                      |           |
     | POST /newAuthz       |           |
-    |  "domain.com"        |           |
+    | "example.com"        |           |
     |--------------------->|           |
     |                      |           |
     | 201 authorizations   |           |
     |<---------------------|           |
     |                      |           |
     | Publish DNS TXT      |           |
-    | "domain.com"         |           |
+    | "example.com"        |           |
     |--------------------------------->|
     |                      |           |
     | POST /challenge      |           |
@@ -111,20 +113,20 @@ The client could pre-authorize for the parent domain once, and then issue multip
     |<---------------------|           |
     |                      |           |
     | Delete DNS TXT       |           |
-    | "domain.com"         |           |
+    | "example.com"        |           |
     |--------------------------------->|
     |                      |           |
  STEP 2: Place order for subdomain
     |                      |           |
     | POST /newOrder       |           |
-    | "sub.domain.com"     |           |
+    | "sub.example.com"    |           |
     |--------------------->|           |
     |                      |           |
     | 201 status=ready     |           |
     |<---------------------|           |
     |                      |           |
     | POST /finalize       |           |
-    | CSR "sub.domain.com" |           |
+    | CSR "sub.example.com"|           |
     |--------------------->|           |
     |                      |           |
     | 200 OK status=valid  |           |
@@ -134,17 +136,15 @@ The client could pre-authorize for the parent domain once, and then issue multip
     |--------------------->|           |
     |                      |           |
     | 200 OK               |           |
-    | PKI "sub.domain.com" |           |
+    | PKI "sub.example.com"|           |
     |<---------------------|           |
 
 ~~~
 
 
-
-
 # IANA Considerations
 
-[todo]
+None.
 
 # Security Considerations 
 

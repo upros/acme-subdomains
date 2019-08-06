@@ -141,6 +141,19 @@ The call flow illustrates the DNS-based proof of ownershp mechanism, but the sub
 
 ~~~
 
+## newOrder Handling
+
+When a client POSTs a request to the newOrder resource that includes a set of identifiers, the server checks whether the identifiers have been previously authorized, and creates authorization objects if necessary. A server may create an authorization object that includes a parent domain identifier in reponse to a newOrder request that includes subdomain identifier or identifiers.
+
+For example, if a client sends a newOrder request that includes identifier "sub.example.com" and the parent domain "example.com" is not authorized, the server may create an authorization object that includes identifier "example.com", and return a link to that object in the newOrder response with status set to "pending". Therefore the server is instructing the client to fulfill a challenge against domain identifier "example.com" in order to obtain a certificate including identifier "sub.example.com".
+
+If the client has already proven ownership of the required parent domain, the server returns an order object with status set to "valid", and includes links to the unexpired authorizations that the client has previously completed against the parent domain.
+
+For example, if a client sends a newOrder request that includes identifier "sub.example.com" and the parent domain "example.com" is currently authorized, the server returns a link to the authorization object for "example.com" with status set to "valid".
+
+## newAuthz Handling
+
+
 # CA/Browser Forum Baseline Requirements
 
 The CA/Browser Forum Baseline Requirements version 1.6.5 states:

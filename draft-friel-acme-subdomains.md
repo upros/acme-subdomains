@@ -78,7 +78,7 @@ ACME does not mandate that the "identifier" in a newOrder request matches the "i
 
 # ACME Issuance of Subdomain Certificates
 
-As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain. ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for the parent domain.
+As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain. ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for the parent domain. The relevant sections from current CA/Browser baseline requirements are given in section {{CA/Browser Forum Baseline Requirements}}.
 
 This allows a flow where a client proves ownership of, for example, "example.com" and then successfully obtains a certificate for "sub.example.com". The ACME pre-authorization flow makes most sense for this use case, and that is what is illustrated in the following call flow.
 
@@ -141,13 +141,22 @@ The call flow illustrates the DNS-based proof of ownershp mechanism, but the sub
 
 ~~~
 
+# CA/Browser Forum Baseline Requirements
+
+The CA/Browser Forum Baseline Requirements version 1.6.5 states:
+
+- Section: "1.6.1 Definitions": Authorization Domain Name: The Domain Name used to obtain authorization for certificate issuance for a given FQDN. The CA may use the FQDN returned from a DNS CNAME lookup as the FQDN for the purposes of domain validation. If the FQDN contains a wildcard character, then the CA MUST remove all wildcard labels from the left most portion of requested FQDN. The CA may prune zero or more labels from left to right until encountering a Base Domain Name and may use any one of the intermediate values for the purpose of domain validation.
+
+
+- Section: "3.2.2.4.7 DNS Change": Once the FQDN has been validated using this method, the CA MAY also issue Certificates for other FQDNs that end with all the labels of the validated FQDN. This method is suitable for validating Wildcard Domain Names.
+
+
 [[ TODO ]]
 
 What happens if client sends newAuthz for a subdomain and the CA doesnt require it?
 What does existing ACME do here? e.g. what happens if client sends an authz req multiple times?
 What is the non pre-authz flow?
 
-Include the baseline text.
 
 
 

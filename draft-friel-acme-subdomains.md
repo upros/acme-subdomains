@@ -141,6 +141,15 @@ The call flow illustrates the DNS-based proof of ownershp mechanism, but the sub
 
 ~~~
 
+[[ TODO ]]
+
+What happens if client sends newAuthz for a subdomain and the CA doesnt require it?
+What does existing ACME do here? e.g. what happens if client sends an authz req multiple times?
+What is the non pre-authz flow?
+
+Include the baseline text.
+
+
 
 # IANA Considerations
 

@@ -153,6 +153,17 @@ For example, if a client sends a newOrder request that includes identifier "sub.
 
 ## newAuthz Handling
 
+When a client POSTs a request to the newAuthz resource for a domain where the server explicitly requires authorization of that domain, the server follows the standard newAuthz handling in ACME.
+
+When a client POSTs a request to the newAuthz resource for a subdomain where the server only requires authorization of a parent domain, and not explicit authorization of the subdomain, the server checks to see if the parent domain is already authorized.
+
+If the parent domain is already authorized, the server should reply with the authorization object that was created when the parent domain was authorized. Therefore, the identifier returned in the authorization object will be the parent domain, and not the subdomain identifier requested by the client. Similarly, the challenges in the authorization object point to the challenges fullfilled when the parent domain was authorized.
+
+For example, if a client sends a newAuthz request that includes identifier "sub.example.com" and the parent domain "example.com" is currently authorized, the server returns the previoiusly created authorization object for "example.com" with status set to "valid".
+
+Similarly, if the parent domain is not currently authorized, the server should create a new authorization object for the parent domain, and return that object with status set to "pending".
+
+For example, if a client sends a newAuthz request that includes identifier "sub.example.com" and the parent domain "example.com" is not authorized, the server creates and returns an authorization object for "example.com" with status set to "pending".
 
 # CA/Browser Forum Baseline Requirements
 
@@ -162,16 +173,6 @@ The CA/Browser Forum Baseline Requirements version 1.6.5 states:
 
 
 - Section: "3.2.2.4.7 DNS Change": Once the FQDN has been validated using this method, the CA MAY also issue Certificates for other FQDNs that end with all the labels of the validated FQDN. This method is suitable for validating Wildcard Domain Names.
-
-
-[[ TODO ]]
-
-What happens if client sends newAuthz for a subdomain and the CA doesnt require it?
-What does existing ACME do here? e.g. what happens if client sends an authz req multiple times?
-What is the non pre-authz flow?
-
-
-
 
 # IANA Considerations
 

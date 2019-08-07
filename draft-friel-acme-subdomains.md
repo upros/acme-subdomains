@@ -159,11 +159,25 @@ When a client POSTs a request to the newAuthz resource for a subdomain where the
 
 If the parent domain is already authorized, the server should reply with the authorization object that was created when the parent domain was authorized. Therefore, the identifier returned in the authorization object will be the parent domain, and not the subdomain identifier requested by the client. Similarly, the challenges in the authorization object point to the challenges fullfilled when the parent domain was authorized.
 
+[[ TODO: that is a change from base ACME, where the identifier in the newAutz request must match that in the authorization object. This needs a review. ]]
+
 For example, if a client sends a newAuthz request that includes identifier "sub.example.com" and the parent domain "example.com" is currently authorized, the server returns the previoiusly created authorization object for "example.com" with status set to "valid".
 
 Similarly, if the parent domain is not currently authorized, the server should create a new authorization object for the parent domain, and return that object with status set to "pending".
 
 For example, if a client sends a newAuthz request that includes identifier "sub.example.com" and the parent domain "example.com" is not authorized, the server creates and returns an authorization object for "example.com" with status set to "pending".
+
+# Directory Object Metadata Fields Registry
+
+[[ TODO: is this required? ]]
+
+An ACME server can advertise support of issuance of subdomain certificates by including the boolean field "implicitSubdomainAuthorization" in its "ACME Directory Metadata Fields" registry. If not specified, the default value is assumed to be "false". If an ACME server supports issunce of subdomain certificates, it can indicate this by including this field with a value of "true".
+
+         +--------------------------------+------------+-----------+
+         | Field Name                     | Field Type | Reference |
+         +--------------------------------+------------+-----------+
+         | implicitSubdomainAuthorization | boolean    | RFC XXXX  |
+         +--------------------------------+------------+-----------+
 
 # CA/Browser Forum Baseline Requirements
 
@@ -176,7 +190,7 @@ The CA/Browser Forum Baseline Requirements version 1.6.5 states:
 
 # IANA Considerations
 
-None.
+[[TODO: register implicitSubdomainAuthorization? ]]
 
 # Security Considerations 
 

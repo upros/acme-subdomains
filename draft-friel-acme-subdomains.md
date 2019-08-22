@@ -149,43 +149,37 @@ The call flow illustrates the DNS-based proof of ownershp mechanism, but the sub
 
 Servers may consider validation of a parent domain sufficient authorization for a subdomain. If a server has such a policy and a client is already authorized for the parent domain then:
 
-- If the client submits a newAuthz request for a subdomain, the server MUST return status 200 (OK) response with the existing authorization object for the parent domain in the body
-- If the client submits a newOrder request for a subdomain, the server MUST return a 201 (Created) response including an order object with status set to "valid" and links to the unexpired authorizations against the parent domain in the body
+- If the client submits a newAuthz request for a subdomain: The server MUST return status 200 (OK) response. The response body is the existing authorization object for the parent domain with status set to "valid".
 
-[[ TODO: This is a change from base ACME, where the identifier in the newAutz request must match that in the authorization object. Additinally a 200 instead of a 201 response code is used. This needs a review. ]]
+- If the client submits a newOrder request for a subdomain: The server MUST return a 201 (Created) response. The response body is an order object with status set to "ready" and links to the unexpired authorizations against the parent domain.
 
 If a server has such a policy and a client is not authorized for the parent domain then:
 
-- If the client submits a newAuthz request for a subdomain, the server MUST create a new authorization object for the parent domain with status set to "pending", and return a status 201 (Created) response including the authorization object in the body
-- If the client submits a newOrder request for a subdomain, the server MUST create a new authorization object for the parent domain with status set to "pending", and return a status 201 (Created) response including an order object with status set to "pending" and links to the new authorizations objects against the parent domain in the body
+- If the client submits a newAuthz request for a subdomain: The server MUST return a status 201 (Created) response. The response body is a newly created authorization object for the parent domain with status set to "pending".
+
+- If the client submits a newOrder request for a subdomain: The server MUST return a status 201 (Created) response. The response body is an order object with status set to "pending" and links to newly created authorizations objects against the parent domain.
+
+[[ TODO: This section documents a change from RFC8555, which states that the identifier in the newAuthz request MUST match that in the authorization object. Additionally 200 response code is used here in once scenario instead of a 201 response. This needs a review. ]]
 
 ## Examples
 
-## newOrder Handling (old)
+In order to illustrate subdomain behaviour, let us assume that a client wishes to get certificates for subdomain identifiers "sub0.example.com", "sub1.example.com" and "sub2.example.com" under parent domain "example.com", and CA policy allows certificate issuance of these subdomain identifiers while only requiring the client to fulfill an ownership challenge for parent domain "example.com". Let us also assume that the client has not yet proven ownership of parent domain "example.com".
 
-When a client POSTs a request to the newOrder resource that includes a set of identifiers, the server checks whether the identifiers have been previously authorized, and creates authorization objects if necessary. A server may create an authorization object that includes a parent domain identifier in reponse to a newOrder request that includes subdomain identifier or identifiers.
+1. The client POSTs a newOrder request for identifier "sub0.example.com"
 
-For example, if a client sends a newOrder request that includes identifier "sub.example.com" and the parent domain "example.com" is not authorized, the server may create an authorization object that includes identifier "example.com", and return a link to that object in the newOrder response with status set to "pending". Therefore the server is instructing the client to fulfill a challenge against domain identifier "example.com" in order to obtain a certificate including identifier "sub.example.com".
+The server creates an authorization object for identifier "example.com". The server replies with a 201 (Created) response. The response body is an order object with status set to "pending" and a link to newly created authorization object against the parent domain "example.com". Therefore the server is instructing the client to fulfill a challenge against domain identifier "example.com" in order to obtain a certificate including identifier "sub0.example.com".
 
-If the client has already proven ownership of the required parent domain, the server returns an order object with status set to "valid", and includes links to the unexpired authorizations that the client has previously completed against the parent domain.
+The client completes the challenge for "example.com", POSTs a CSR to the order finalize URI, and downloads the certificate.
 
-For example, if a client sends a newOrder request that includes identifier "sub.example.com" and the parent domain "example.com" is currently authorized, the server returns a link to the authorization object for "example.com" with status set to "valid".
+2. The client POSTs a newOrder request for identifier "sub1.example.com"
 
-## newAuthz Handling (old)
+The server replies with a 201 (Created) response. The response body is an order object with status set to "ready" and a link to the unexpired authorization against the parent domain "example.com". 
 
-When a client POSTs a request to the newAuthz resource for a domain where the server explicitly requires authorization of that domain, the server follows the standard newAuthz handling in ACME.
+The client POSTs a CSR to the order finalize URI, and downloads the certificate.
 
-When a client POSTs a request to the newAuthz resource for a subdomain where the server only requires authorization of a parent domain, and not explicit authorization of the subdomain, the server checks to see if the parent domain is already authorized.
+3. The client POSTs a newAuthz request for identifier "sub2.example.com"
 
-If the parent domain is already authorized, the server should reply with the authorization object that was created when the parent domain was authorized. Therefore, the identifier returned in the authorization object will be the parent domain, and not the subdomain identifier requested by the client. Similarly, the challenges in the authorization object point to the challenges fullfilled when the parent domain was authorized.
-
-[[ TODO: that is a change from base ACME, where the identifier in the newAutz request must match that in the authorization object. This needs a review. ]]
-
-For example, if a client sends a newAuthz request that includes identifier "sub.example.com" and the parent domain "example.com" is currently authorized, the server returns the previoiusly created authorization object for "example.com" with status set to "valid".
-
-Similarly, if the parent domain is not currently authorized, the server should create a new authorization object for the parent domain, and return that object with status set to "pending".
-
-For example, if a client sends a newAuthz request that includes identifier "sub.example.com" and the parent domain "example.com" is not authorized, the server creates and returns an authorization object for "example.com" with status set to "pending".
+The server replies with a 200 (OK) response. The response body is the previoiusly created authorization object for "example.com" with status set to "valid".
 
 # Directory Object Metadata Fields Registry
 

@@ -179,7 +179,7 @@ The client POSTs a CSR to the order finalize URI, and downloads the certificate.
 
 3. The client POSTs a newAuthz request for identifier "sub2.example.com"
 
-The server replies with a 200 (OK) response. The response body is the previoiusly created authorization object for "example.com" with status set to "valid".
+The server replies with a 200 (OK) response. The response body is the previously created authorization object for "example.com" with status set to "valid".
 
 # Directory Object Metadata Fields Registry
 

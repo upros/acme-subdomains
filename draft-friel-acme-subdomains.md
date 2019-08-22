@@ -22,7 +22,7 @@ author:
 
 --- abstract
 
-This document outlines how ACME can be used by a client to obtain a certificate for a subdomain identifier from a certificate authority. The client has fulfilled a challenge against a parent domain but does not need to fulfill a challenge against the explicit subdomain, and certificate authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
+This document outlines how ACME can be used by a client to obtain a certificate for a subdomain identifier from a certificate authority. The client has fulfilled a challenge against a parent domain but does not need to fulfill a challenge against the explicit subdomain as certificate authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
 
 --- middle
 
@@ -63,6 +63,10 @@ A typical ACME workflow for issuance of certificates is as follows:
 4. client proves control over the "identifier" in the "authorization" object by completing the specified challenge, for example, by publishing a DNS TXT record
 
 5. client POSTs a CSR to the "finalize" API
+
+6. server replies with an updated order object that includes a "certificate" URI
+
+7. client sends POST-as-GET request to the "certificate" URI to download the certificate
 
 ACME places the following restrictions on "identifiers":
 
@@ -141,7 +145,23 @@ The call flow illustrates the DNS-based proof of ownershp mechanism, but the sub
 
 ~~~
 
-## newOrder Handling
+## newOrder and newAuthz Handling
+
+Servers may consider validation of a parent domain sufficient authorization for a subdomain. If a server has such a policy and a client is already authorized for the parent domain then:
+
+- If the client submits a newAuthz request for a subdomain, the server MUST return status 200 (OK) response with the existing authorization object for the parent domain in the body
+- If the client submits a newOrder request for a subdomain, the server MUST return a 201 (Created) response including an order object with status set to "valid" and links to the unexpired authorizations against the parent domain in the body
+
+[[ TODO: This is a change from base ACME, where the identifier in the newAutz request must match that in the authorization object. Additinally a 200 instead of a 201 response code is used. This needs a review. ]]
+
+If a server has such a policy and a client is not authorized for the parent domain then:
+
+- If the client submits a newAuthz request for a subdomain, the server MUST create a new authorization object for the parent domain with status set to "pending", and return a status 201 (Created) response including the authorization object in the body
+- If the client submits a newOrder request for a subdomain, the server MUST create a new authorization object for the parent domain with status set to "pending", and return a status 201 (Created) response including an order object with status set to "pending" and links to the new authorizations objects against the parent domain in the body
+
+## Examples
+
+## newOrder Handling (old)
 
 When a client POSTs a request to the newOrder resource that includes a set of identifiers, the server checks whether the identifiers have been previously authorized, and creates authorization objects if necessary. A server may create an authorization object that includes a parent domain identifier in reponse to a newOrder request that includes subdomain identifier or identifiers.
 
@@ -151,7 +171,7 @@ If the client has already proven ownership of the required parent domain, the se
 
 For example, if a client sends a newOrder request that includes identifier "sub.example.com" and the parent domain "example.com" is currently authorized, the server returns a link to the authorization object for "example.com" with status set to "valid".
 
-## newAuthz Handling
+## newAuthz Handling (old)
 
 When a client POSTs a request to the newAuthz resource for a domain where the server explicitly requires authorization of that domain, the server follows the standard newAuthz handling in ACME.
 

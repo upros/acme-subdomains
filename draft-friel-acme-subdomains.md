@@ -185,7 +185,7 @@ The server replies with a 200 (OK) response. The response body is the previously
 
 [[ TODO: is this required? ]]
 
-An ACME server can advertise support of issuance of subdomain certificates by including the boolean field "implicitSubdomainAuthorization" in its "ACME Directory Metadata Fields" registry. If not specified, the default value is assumed to be "false". If an ACME server supports issunce of subdomain certificates, it can indicate this by including this field with a value of "true".
+An ACME server can advertise support of issuance of subdomain certificates by including the boolean field "implicitSubdomainAuthorization" in its "ACME Directory Metadata Fields" registry. If not specified, then no default value is assumed. If an ACME server supports issunce of subdomain certificates, it can indicate this by including this field with a value of "true".
 
          +--------------------------------+------------+-----------+
          | Field Name                     | Field Type | Reference |

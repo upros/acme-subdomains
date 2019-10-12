@@ -167,7 +167,11 @@ If a server has such a policy and a client is not authorized for the parent doma
 
 - If the client submits a newOrder request for a subdomain: The server MUST return a status 201 (Created) response. The response body is an order object with status set to "pending" and links to newly created authorizations objects against the parent domain.
 
-[[ TODO: This section documents a change from RFC8555, which states that the identifier in the newAuthz request MUST match that in the authorization object. Additionally, 200 response code is used here in one scenario instead of a 201 response. This needs a review. ]]
+[[ TODO: This section documents a change from RFC8555, which states that the identifier in the newAuthz request MUST match that in the authorization object.
+
+Additionally, 200 response code is used here in one scenario instead of a 201 response. However, this is arguably an under-specification in RFC8555, and has been reported in https://www.rfc-editor.org/errata/eid5861.
+
+These two items need a review. ]]
 
 ## Examples
 

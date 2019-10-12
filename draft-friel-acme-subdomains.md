@@ -31,7 +31,7 @@ author:
     
 --- abstract
 
-This document outlines how ACME can be used by a client to obtain a certificate for a subdomain identifier from a certificate authority. The client has fulfilled a challenge against a parent domain but does not need to fulfill a challenge against the explicit subdomain as certificate authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
+This document outlines how ACME can be used by a client to obtain a certificate for a subdomain identifier from a certificate authority. The client has fulfilled a challenge against a parent domain but does not need to fulfil a challenge against the explicit subdomain as certificate authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
 
 --- middle
 
@@ -40,7 +40,7 @@ This document outlines how ACME can be used by a client to obtain a certificate 
 
 ACME {{?RFC8555}} defines a protocol that a certificate authority (CA) and an applicant can use to automate the process of domain name ownership validation and X.509 (PKIX) certificate issuance. The protocol is rich and flexible and enables multiple use cases that are not immediately obvious from reading the specification.
 
-This document explicitly outlines how ACME can be used to issue subdomain certificates, without requiring the ACME client to explicitly fulfill an ownership challenge against the subdomain identifiers - the ACME client need only fulfill an ownership challenge against a parent domain identifier.
+This document explicitly outlines how ACME can be used to issue subdomain certificates, without requiring the ACME client to explicitly fulfil an ownership challenge against the subdomain identifiers - the ACME client need only fulfil an ownership challenge against a parent domain identifier.
 
 # Terminology
 
@@ -90,13 +90,13 @@ ACME does not mandate that the "identifier" in a newOrder request matches the "i
 
 # ACME Issuance of Subdomain Certificates
 
-As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain. ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for the parent domain. The relevant sections from current CA/Browser baseline requirements are given in section {{ca-browser-forum-baseline-requirements}}.
+As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain. ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfil an authorization challenge for the parent domain. The relevant sections from current CA/Browser baseline requirements are given in section {{ca-browser-forum-baseline-requirements}}.
 
 This allows a flow where a client proves ownership of, for example, "example.com" and then successfully obtains a certificate for "sub.example.com". The ACME pre-authorization flow makes most sense for this use case, and that is what is illustrated in the following call flow.
 
 The client could pre-authorize for the parent domain once, and then issue multiple newOrder requests for certificates for multiple subdomains. This call flow illustrates the client only placing one newOrder request.
 
-The call flow illustrates the DNS-based proof of ownershp mechanism, but the subdomain workflow is equally valid for HTTP based proof of ownership.
+The call flow illustrates the DNS-based proof of ownership mechanism, but the subdomain workflow is equally valid for HTTP based proof of ownership.
 
 ~~~
 
@@ -167,15 +167,15 @@ If a server has such a policy and a client is not authorized for the parent doma
 
 - If the client submits a newOrder request for a subdomain: The server MUST return a status 201 (Created) response. The response body is an order object with status set to "pending" and links to newly created authorizations objects against the parent domain.
 
-[[ TODO: This section documents a change from RFC8555, which states that the identifier in the newAuthz request MUST match that in the authorization object. Additionally 200 response code is used here in one scenario instead of a 201 response. This needs a review. ]]
+[[ TODO: This section documents a change from RFC8555, which states that the identifier in the newAuthz request MUST match that in the authorization object. Additionally, 200 response code is used here in one scenario instead of a 201 response. This needs a review. ]]
 
 ## Examples
 
-In order to illustrate subdomain behaviour, let us assume that a client wishes to get certificates for subdomain identifiers "sub0.example.com", "sub1.example.com" and "sub2.example.com" under parent domain "example.com", and CA policy allows certificate issuance of these subdomain identifiers while only requiring the client to fulfill an ownership challenge for parent domain "example.com". Let us also assume that the client has not yet proven ownership of parent domain "example.com".
+In order to illustrate subdomain behaviour, let us assume that a client wishes to get certificates for subdomain identifiers "sub0.example.com", "sub1.example.com" and "sub2.example.com" under parent domain "example.com", and CA policy allows certificate issuance of these subdomain identifiers while only requiring the client to fulfil an ownership challenge for parent domain "example.com". Let us also assume that the client has not yet proven ownership of parent domain "example.com".
 
 1. The client POSTs a newOrder request for identifier "sub0.example.com"
 
-The server creates an authorization object for identifier "example.com". The server replies with a 201 (Created) response. The response body is an order object with status set to "pending" and a link to newly created authorization object against the parent domain "example.com". Therefore the server is instructing the client to fulfill a challenge against domain identifier "example.com" in order to obtain a certificate including identifier "sub0.example.com".
+The server creates an authorization object for identifier "example.com". The server replies with a 201 (Created) response. The response body is an order object with status set to "pending" and a link to newly created authorization object against the parent domain "example.com". Therefore, the server is instructing the client to fulfil a challenge against domain identifier "example.com" in order to obtain a certificate including identifier "sub0.example.com".
 
 The client completes the challenge for "example.com", POSTs a CSR to the order finalize URI, and downloads the certificate.
 
@@ -194,7 +194,7 @@ The server replies with a 200 (OK) response. The response body is the previously
 
 [[ TODO: is this required? ]]
 
-An ACME server can advertise support of issuance of subdomain certificates by including the boolean field "implicitSubdomainAuthorization" in its "ACME Directory Metadata Fields" registry. If not specified, then no default value is assumed. If an ACME server supports issunce of subdomain certificates, it can indicate this by including this field with a value of "true".
+An ACME server can advertise support of issuance of subdomain certificates by including the boolean field "implicitSubdomainAuthorization" in its "ACME Directory Metadata Fields" registry. If not specified, then no default value is assumed. If an ACME server supports issuance of subdomain certificates, it can indicate this by including this field with a value of "true".
 
          +--------------------------------+------------+-----------+
          | Field Name                     | Field Type | Reference |

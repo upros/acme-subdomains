@@ -1,30 +1,34 @@
 ---
-
+stand_alone: yes
 title: "ACME for Subdomains"
 abbrev: ACME-SUBDOMAINS
 docname: draft-friel-acme-subdomains-latest
-category: std
-
-stand_alone: yes
-pi: [toc, sortrefs, symrefs]
-
+cat: std
+coding: utf-8
+pi:
+  strict: 'yes'
+  toc: 'yes'
+  tocdepth: '2'
+  symrefs: 'yes'
+  sortrefs: 'yes'
+  compact: 'no'
+  subcompact: 'no'
+  comments: 'yes'
+  inline: 'yes'
 author:
- -
-    ins: O. Friel
+ -  ins: O. Friel
     name: Owen Friel
     org: Cisco
     email: ofriel@cisco.com
- -
-    ins: R. Barnes
+ -  ins: R. Barnes
     name: Richard Barnes
     org: Cisco
     email: rlb@ipv.sx
--
-    ins: T. Hollebeek
+ -  ins: T. Hollebeek
     name: Tim Hollebeek
     org: DigiCert
     email: tim.hollebeek@digicert.com
-
+    
 --- abstract
 
 This document outlines how ACME can be used by a client to obtain a certificate for a subdomain identifier from a certificate authority. The client has fulfilled a challenge against a parent domain but does not need to fulfill a challenge against the explicit subdomain as certificate authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
@@ -46,7 +50,6 @@ This document explicitly outlines how ACME can be used to issue subdomain certif
    14 {{?RFC2119}} {{?RFC8174}} when, and only when, they appear in all
    capitals, as shown here.
    
-
 The following terms are used in this document:
 
 - CA: Certificate Authority
@@ -87,7 +90,7 @@ ACME does not mandate that the "identifier" in a newOrder request matches the "i
 
 # ACME Issuance of Subdomain Certificates
 
-As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain. ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for the parent domain. The relevant sections from current CA/Browser baseline requirements are given in section {{CA/Browser Forum Baseline Requirements}}.
+As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain. ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for the parent domain. The relevant sections from current CA/Browser baseline requirements are given in section {{ca-browser-forum-baseline-requirements}}.
 
 This allows a flow where a client proves ownership of, for example, "example.com" and then successfully obtains a certificate for "sub.example.com". The ACME pre-authorization flow makes most sense for this use case, and that is what is illustrated in the following call flow.
 
@@ -186,6 +189,7 @@ The client POSTs a CSR to the order finalize URI, and downloads the certificate.
 
 The server replies with a 200 (OK) response. The response body is the previously created authorization object for "example.com" with status set to "valid".
 
+
 # Directory Object Metadata Fields Registry
 
 [[ TODO: is this required? ]]
@@ -198,7 +202,18 @@ An ACME server can advertise support of issuance of subdomain certificates by in
          | implicitSubdomainAuthorization | boolean    | RFC XXXX  |
          +--------------------------------+------------+-----------+
 
-# CA/Browser Forum Baseline Requirements
+
+# IANA Considerations
+
+[[TODO: register implicitSubdomainAuthorization? ]]
+
+# Security Considerations 
+
+[[TODO]]
+
+--- back
+
+# CA Browser Forum Baseline Requirements
 
 The CA/Browser Forum Baseline Requirements version 1.6.5 states:
 
@@ -207,14 +222,3 @@ The CA/Browser Forum Baseline Requirements version 1.6.5 states:
 
 - Section: "3.2.2.4.7 DNS Change": Once the FQDN has been validated using this method, the CA MAY also issue Certificates for other FQDNs that end with all the labels of the validated FQDN. This method is suitable for validating Wildcard Domain Names.
 
-# IANA Considerations
-
-[[TODO: register implicitSubdomainAuthorization? ]]
-
-# Security Considerations 
-
-[todo]
-
---- back
-
-# Comments

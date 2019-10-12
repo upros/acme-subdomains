@@ -90,7 +90,7 @@ ACME does not mandate that the "identifier" in a newOrder request matches the "i
 
 # ACME Issuance of Subdomain Certificates
 
-As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain. ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfil an authorization challenge for the parent domain. The relevant sections from current CA/Browser baseline requirements are given in section {{ca-browser-forum-baseline-requirements}}.
+As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain. ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfil an authorization challenge for the parent domain. The relevant sections from current CA/Browser baseline requirements are given in {{ca-browser-forum-baseline-requirements}}.
 
 This allows a flow where a client proves ownership of, for example, "example.com" and then successfully obtains a certificate for "sub.example.com". The ACME pre-authorization flow makes most sense for this use case, and that is what is illustrated in the following call flow.
 

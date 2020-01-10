@@ -193,23 +193,41 @@ The client POSTs a CSR to the order finalize URI, and downloads the certificate.
 
 The server replies with a 200 (OK) response. The response body is the previously created authorization object for "example.com" with status set to "valid".
 
+# Authorization Objects
 
-# Directory Object Metadata Fields Registry
+If an ACME server allows issuance of certificates for subdomains of a parent domain, then the authorization object for the parent domain MUST include the optional "basedomain" field, with a value of true.
 
-[[ TODO: is this required? ]]
+The structure of an ACME authorization resource is enhanced to include the following optional field:
+
+   basedomain (optional, boolean):  This field MUST be present and true
+      for authorizations where ACME server policy allows certificates to
+      to be issued for subdomains of the identifier in the authorization
+      object without explicit authorization of the subdomain
+
+# Directory Object Metadata
 
 An ACME server can advertise support of issuance of subdomain certificates by including the boolean field "implicitSubdomainAuthorization" in its "ACME Directory Metadata Fields" registry. If not specified, then no default value is assumed. If an ACME server supports issuance of subdomain certificates, it can indicate this by including this field with a value of "true".
 
+# IANA Considerations
+
+## Authorization Object Fields Registry 
+
+The following field is added to the "ACME Authorization Object Fields" registry defined in ACME {{?RFC8555}}.
+
+        +------------+-----------------+--------------+-----------+
+        | Field Name | Field Type      | Configurable | Reference |
+        +------------+-----------------+--------------+-----------+
+        | basedomain | boolean         | false        | RFC XXXX  |
+        +------------+-----------------+--------------+-----------+
+
+## Directory Object Metadata Fields Registry
+
+The following field is added to the "ACME Directory Metadata Fields" registry defined in ACME {{?RFC8555}}.
          +--------------------------------+------------+-----------+
          | Field Name                     | Field Type | Reference |
          +--------------------------------+------------+-----------+
          | implicitSubdomainAuthorization | boolean    | RFC XXXX  |
          +--------------------------------+------------+-----------+
-
-
-# IANA Considerations
-
-[[TODO: register implicitSubdomainAuthorization? ]]
 
 # Security Considerations 
 

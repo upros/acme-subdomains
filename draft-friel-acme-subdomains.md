@@ -191,7 +191,11 @@ The client POSTs a CSR to the order finalize URI, and downloads the certificate.
 
 The server replies with a 200 (OK) response. The response body is the previously created authorization object for "example.com" with status set to "valid".
 
-# Authorization Objects
+# Resource Enhancements
+
+This document defines enhancements to the authorization and directory objects.
+
+## Authorization Objects
 
 If an ACME server allows issuance of certificates for subdomains of a parent domain, then the authorization object for the parent domain MUST include the optional "basedomain" field, with a value of true.
 
@@ -202,7 +206,7 @@ The structure of an ACME authorization resource is enhanced to include the follo
       to be issued for subdomains of the identifier in the authorization
       object without explicit authorization of the subdomain
 
-# Directory Object Metadata
+## Directory Object Metadata
 
 An ACME server can advertise support of issuance of subdomain certificates by including the boolean field "implicitSubdomainAuthorization" in its "ACME Directory Metadata Fields" registry. If not specified, then no default value is assumed. If an ACME server supports issuance of subdomain certificates, it can indicate this by including this field with a value of "true".
 

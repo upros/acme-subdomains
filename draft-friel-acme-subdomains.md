@@ -195,7 +195,7 @@ The server replies with a 200 (OK) response. The response body is the previously
 
 This document defines enhancements to the authorization and directory objects.
 
-## Authorization Objects
+## Authorization Object
 
 If an ACME server allows issuance of certificates for subdomains of a parent domain, then the authorization object for the parent domain MUST include the optional "basedomain" field, with a value of true.
 

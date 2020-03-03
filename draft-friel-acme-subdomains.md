@@ -28,7 +28,11 @@ author:
     name: Tim Hollebeek
     org: DigiCert
     email: tim.hollebeek@digicert.com
-    
+ -  ins: M. Richardson
+    name: Michael Richardson
+    org: Sandelman Software Works
+    email: mcr+ietf@sandelman.ca    
+ 
 --- abstract
 
 This document outlines how ACME can be used by a client to obtain a certificate for a subdomain identifier from a certificate authority. The client has fulfilled a challenge against a parent domain but does not need to fulfil a challenge against the explicit subdomain as certificate authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.

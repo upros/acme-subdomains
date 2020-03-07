@@ -2,7 +2,7 @@
 stand_alone: yes
 title: "ACME for Subdomains"
 abbrev: ACME-SUBDOMAINS
-docname: draft-friel-acme-subdomains-latest
+docname: draft-friel-acme-subdomains-01
 cat: std
 coding: utf-8
 pi:
@@ -28,7 +28,12 @@ author:
     name: Tim Hollebeek
     org: DigiCert
     email: tim.hollebeek@digicert.com
-    
+informative:
+  CAB:
+    author:
+      org: CA/Browser Forum
+    title: Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates
+    target: https://cabforum.org/baseline-requirements-documents/
 --- abstract
 
 This document outlines how ACME can be used by a client to obtain a certificate for a subdomain identifier from a certificate authority. The client has fulfilled a challenge against a parent domain but does not need to fulfil a challenge against the explicit subdomain as certificate authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
@@ -88,13 +93,21 @@ ACME does not mandate that the "identifier" in a newOrder request matches the "i
 
 # ACME Issuance of Subdomain Certificates
 
-As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain. ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfil an authorization challenge for the parent domain. The relevant sections from current CA/Browser baseline requirements are given in {{ca-browser-forum-baseline-requirements}}.
+As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain.
 
-This allows a flow where a client proves ownership of, for example, "example.com" and then successfully obtains a certificate for "sub.example.com". The ACME pre-authorization flow makes most sense for this use case, and that is what is illustrated in the following call flow.
+ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfil an authorization challenge for a parent domain of that subdomain. This allows a flow where a client proves ownership of, for example, "example.com" and then successfully obtains a certificate for "sub.example.com".
 
-The client could pre-authorize for the parent domain once, and then issue multiple newOrder requests for certificates for multiple subdomains. This call flow illustrates the client only placing one newOrder request.
+ACME server policy is out of scope of this document, however some commentary is provided in {{acme-server-policy-considerations}}.
 
-The call flow illustrates the DNS-based proof of ownership mechanism, but the subdomain workflow is equally valid for HTTP based proof of ownership.
+## Pre-Authorization
+
+The standard ACME workflow has authorization objects created reactively in response to a certificate order. ACME also allows for pre-authorization, where clients obtain authorization for an identifier proactively, outside of the context of a specific issuance. This document allows for both workflows, and {{neworder-and-newauthz-handling}} outlines how the ACME server handles newOrder and newAuthz requests for both workflows.
+
+It may make sense to use the ACME pre-authorization flow for the subdomain use case, however, that is an operator implementation and deployment decision. With the ACME pre-authorization flow, the client could pre-authorize for the parent domain once, and then issue multiple newOrder requests for certificates for multiple subdomains.
+
+## Illustrative Call Flow
+
+The call flow illustrated here uses the ACME pre-authorization flow. The call flow also illustrates the DNS-based proof of ownership mechanism, but the subdomain workflow is equally valid for HTTP based proof of ownership.
 
 ~~~
 
@@ -177,19 +190,19 @@ In order to illustrate subdomain behaviour, let us assume that a client wishes t
 
 1. The client POSTs a newOrder request for identifier "sub0.example.com"
 
-The server creates an authorization object for identifier "example.com". The server replies with a 201 (Created) response. The response body is an order object with status set to "pending" and a link to newly created authorization object against the parent domain "example.com". Therefore, the server is instructing the client to fulfil a challenge against domain identifier "example.com" in order to obtain a certificate including identifier "sub0.example.com".
+    The server creates an authorization object for identifier "example.com". The server replies with a 201 (Created) response. The response body is an order object with status set to "pending" and a link to newly created authorization object against the parent domain "example.com". Therefore, the server is instructing the client to fulfil a challenge against domain identifier "example.com" in order to obtain a certificate including identifier "sub0.example.com".
 
-The client completes the challenge for "example.com", POSTs a CSR to the order finalize URI, and downloads the certificate.
+    The client completes the challenge for "example.com", POSTs a CSR to the order finalize URI, and downloads the certificate.
 
 2. The client POSTs a newOrder request for identifier "sub1.example.com"
 
-The server replies with a 201 (Created) response. The response body is an order object with status set to "ready" and a link to the unexpired authorization against the parent domain "example.com". 
+    The server replies with a 201 (Created) response. The response body is an order object with status set to "ready" and a link to the unexpired authorization against the parent domain "example.com". 
 
-The client POSTs a CSR to the order finalize URI, and downloads the certificate.
+    The client POSTs a CSR to the order finalize URI, and downloads the certificate.
 
 3. The client POSTs a newAuthz request for identifier "sub2.example.com"
 
-The server replies with a 200 (OK) response. The response body is the previously created authorization object for "example.com" with status set to "valid".
+    The server replies with a 200 (OK) response. The response body is the previously created authorization object for "example.com" with status set to "valid".
 
 # Resource Enhancements
 
@@ -237,12 +250,26 @@ The following field is added to the "ACME Directory Metadata Fields" registry de
 
 --- back
 
-# CA Browser Forum Baseline Requirements
+# ACME Server Policy Considerations
 
-The CA/Browser Forum Baseline Requirements version 1.6.5 states:
+The ACME specification does not mandate any specific ACME server or CA policies, or any specific use cases for issuance of certificates. For example, an ACME server could be used:
+
+- to issue Web PKI certificates where the ACME server must comply with CA/Browser [CAB] Baseline Requirements.
+- as a Private CA for issuance of certificates within an organisation. The organisation could enforce whatever policies they desire on the ACME server.
+- for issuance of IoT device certificates. There are currently no IoT device certificate policies that are generally enforced across the industry. Organsations issuing IoT device certificates can enforce whatever policies they desire on the ACME server.
+
+ACME server policy will specify whether:
+
+- issuance of subdomain certificates is allowed based on proof of ownership of a parent domain
+- whether DNS based proof of ownership, or HTTP based proof of ownership, or both, are allowed
+
+ACME server policy specification is exlpicitly out of scope of this document.
+
+## CA Browser Forum Baseline Requirements Extracts
+
+The CA/Browser Forum Baseline Requirements [CAB] allow issuance of subdomain certificates where authorization is only required for a parent domain. Baseline Requirements version 1.6.5 states:
 
 - Section: "1.6.1 Definitions": Authorization Domain Name: The Domain Name used to obtain authorization for certificate issuance for a given FQDN. The CA may use the FQDN returned from a DNS CNAME lookup as the FQDN for the purposes of domain validation. If the FQDN contains a wildcard character, then the CA MUST remove all wildcard labels from the left most portion of requested FQDN. The CA may prune zero or more labels from left to right until encountering a Base Domain Name and may use any one of the intermediate values for the purpose of domain validation.
 
 
 - Section: "3.2.2.4.7 DNS Change": Once the FQDN has been validated using this method, the CA MAY also issue Certificates for other FQDNs that end with all the labels of the validated FQDN. This method is suitable for validating Wildcard Domain Names.
-

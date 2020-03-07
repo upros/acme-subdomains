@@ -263,7 +263,7 @@ The ACME specification does not mandate any specific ACME server or CA policies,
 - as a Private CA for issuance of certificates within an organisation. The organisation could enforce whatever policies they desire on the ACME server.
 - for issuance of IoT device certificates. There are currently no IoT device certificate policies that are generally enforced across the industry. Organsations issuing IoT device certificates can enforce whatever policies they desire on the ACME server.
 
-ACME server policy will specify whether:
+ACME server policy could specify whether:
 
 - issuance of subdomain certificates is allowed based on proof of ownership of a parent domain
 - whether DNS based proof of ownership, or HTTP based proof of ownership, or both, are allowed

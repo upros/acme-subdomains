@@ -195,12 +195,6 @@ If a server has such a policy and a client is not authorized for the parent doma
 
 - If the client submits a newOrder request for a subdomain: The server MUST return a status 201 (Created) response. The response body is an order object with status set to "pending" and links to newly created authorizations objects against the parent domain.
 
-[[ TODO: This section documents a change from RFC8555 section 7.4.1 which states "Note that because the identifier in a pre-authorization request is the exact identifier to be included in the authorization object, pre-authorization cannot be used to authorize issuance of certificates containing wildcard domain names."
-
-Additionally, 200 response code is used here in one scenario instead of a 201 response. However, this is arguably an under-specification in RFC8555, and has been reported in https://www.rfc-editor.org/errata/eid5861.
-
-These two items need a review. ]]
-
 ## Examples
 
 In order to illustrate subdomain behaviour, let us assume that a client wishes to get certificates for subdomain identifiers "sub0.example.com", "sub1.example.com" and "sub2.example.com" under parent domain "example.com", and CA policy allows certificate issuance of these subdomain identifiers while only requiring the client to fulfil an ownership challenge for parent domain "example.com". Let us also assume that the client has not yet proven ownership of parent domain "example.com".

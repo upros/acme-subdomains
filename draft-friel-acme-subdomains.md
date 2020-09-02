@@ -56,12 +56,8 @@ ACME {{?RFC8555}} defines a protocol that a certification authority (CA) and an 
 
 # Terminology
 
-   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in BCP
-   14 {{?RFC2119}} {{?RFC8174}} when, and only when, they appear in all
-   capitals, as shown here.
-   
+{::boilerplate bcp14}
+
 The following terms are defined in the CA/Browser Baseline Requirements [CAB] and are reproduced here:
 
 - Base Domain Name: The portion of an applied-for FQDN that is the first domain name node left of a registry-controlled or public suffix plus the registry-controlled or public suffix (e.g. “example.co.uk” or “example.com”). For FQDNs where the right-most domain name node is a gTLD having ICANN Specification 13 in its registry agreement, the gTLD itself may be used as the Base Domain Name.
@@ -211,7 +207,7 @@ In order to illustrate subdomain behaviour, let us assume that a client wishes t
 
 2. The client POSTs a newOrder request for identifier "sub1.example.com"
 
-    The server replies with a 201 (Created) response. The response body is an order object with status set to "ready" and a link to the unexpired authorization against the parent domain "example.com". 
+    The server replies with a 201 (Created) response. The response body is an order object with status set to "ready" and a link to the unexpired authorization against the parent domain "example.com".
 
     The client POSTs a CSR to the order finalize URI, and downloads the certificate.
 
@@ -240,7 +236,7 @@ An ACME server can advertise support of issuance of subdomain certificates by in
 
 # IANA Considerations
 
-## Authorization Object Fields Registry 
+## Authorization Object Fields Registry
 
 The following field is added to the "ACME Authorization Object Fields" registry defined in ACME {{?RFC8555}}.
 
@@ -260,7 +256,7 @@ The following field is added to the "ACME Directory Metadata Fields" registry de
          | includeSubDomainsAuthorization | boolean    | RFC XXXX  |
          +--------------------------------+------------+-----------+
 
-# Security Considerations 
+# Security Considerations
 
 This document documents enhancements to ACME {{?RFC8555}} that optimize the protocol flows for issuance of certificates for subdomains. The underlying goal of ACME for Subdomains remains the same as that of ACME: managing certificates that attest to identifier/key bindings for these subdomains. Thus, ACME for Subdomains has the same two security goals as ACME:
 
@@ -286,7 +282,7 @@ Therefore, all Security Considerations in ACME in the following areas are equall
 
 - Server-Side Request Forgery
 
-- CA Policy Considerations 
+- CA Policy Considerations
 
 Some additional comments on ACME server opicy are given in the following section.
 
@@ -294,7 +290,7 @@ Some additional comments on ACME server opicy are given in the following section
 
 The ACME for Subdomains and the ACME specifications do not mandate any specific ACME server or CA policies, or any specific use cases for issuance of certificates. For example, an ACME server could be used:
 
-- to issue Web PKI certificates where the ACME server must comply with CA/Browser Forum [CAB] Baseline Requirements. 
+- to issue Web PKI certificates where the ACME server must comply with CA/Browser Forum [CAB] Baseline Requirements.
 
 - as a Private CA for issuance of certificates within an organisation. The organisation could enforce whatever policies they desire on the ACME server.
 

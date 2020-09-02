@@ -1,11 +1,13 @@
 ---
 stand_alone: yes
+ipr: trust200902
 title: "ACME for Subdomains"
 abbrev: ACME-SUBDOMAINS
-docname: draft-friel-acme-subdomains-02
-cat: std
+docname: draft-friel-acme-subdomains-03
+category: std
 coding: utf-8
 pi:
+  consensus: 'yes'
   strict: 'yes'
   toc: 'yes'
   tocdepth: '2'
@@ -15,6 +17,7 @@ pi:
   subcompact: 'no'
   comments: 'yes'
   inline: 'yes'
+
 author:
  -  ins: O. Friel
     name: Owen Friel
@@ -32,6 +35,7 @@ author:
     name: Michael Richardson
     org: Sandelman Software Works
     email: mcr+ietf@sandelman.ca
+
 informative:
   CAB:
     author:

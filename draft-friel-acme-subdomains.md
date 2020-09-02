@@ -264,26 +264,57 @@ The following field is added to the "ACME Directory Metadata Fields" registry de
 
 # Security Considerations 
 
-[[TODO]]
+This document documents enhancements to ACME {{?RFC8555}} that optimize the protocol flows for issuance of certificates for subdomains. The underlying goal of ACME for Subdomains remains the same as that of ACME: managing certificates that attest to identifier/key bindings for these subdomains. Thus, ACME for Subdomains has the same two security goals as ACME:
 
---- back
+1. Only an entity that controls an identifier can get an authorization for that identifier
 
-# ACME Server Policy Considerations
+2. Once authorized, an account key's authorizations cannot be improperly used by another account
 
-The ACME specification does not mandate any specific ACME server or CA policies, or any specific use cases for issuance of certificates. For example, an ACME server could be used:
+ACME for Subdomains makes no changes to:
 
-- to issue Web PKI certificates where the ACME server must comply with CA/Browser [CAB] Baseline Requirements.
+- account or account key management
+
+- ACME channel establishment, security mechanisms or threat model
+
+- Validation channel establishment, security mechanisms or threat model
+
+Therefore, all Security Considerations in ACME in the following areas are equally applicable to ACME for Subdomains:
+
+- Threat Model
+
+- Integrity of Authorizations
+
+- Denial-of-Service Considerations
+
+- Server-Side Request Forgery
+
+- CA Policy Considerations 
+
+Some additional comments on ACME server opicy are given in the following section.
+
+## ACME Server Policy Considerations
+
+The ACME for Subdomains and the ACME specifications do not mandate any specific ACME server or CA policies, or any specific use cases for issuance of certificates. For example, an ACME server could be used:
+
+- to issue Web PKI certificates where the ACME server must comply with CA/Browser Forum [CAB] Baseline Requirements. 
+
 - as a Private CA for issuance of certificates within an organisation. The organisation could enforce whatever policies they desire on the ACME server.
+
 - for issuance of IoT device certificates. There are currently no IoT device certificate policies that are generally enforced across the industry. Organsations issuing IoT device certificates can enforce whatever policies they desire on the ACME server.
 
 ACME server policy could specify whether:
 
 - issuance of subdomain certificates is allowed based on proof of ownership of a parent domain
+
+- issuance of subdomain certificates is allowed, but only for a specific set of parent domains
+
 - whether DNS based proof of ownership, or HTTP based proof of ownership, or both, are allowed
 
-ACME server policy specification is exlpicitly out of scope of this document.
+ACME server policy specification is exlpicitly out of scope of this document. For reference, extracts from CA/Browser Forum Baseline Requirements are given in the appendices.
 
-## CA Browser Forum Baseline Requirements Extracts
+--- back
+
+# CA Browser Forum Baseline Requirements Extracts
 
 The CA/Browser Forum Baseline Requirements [CAB] allow issuance of subdomain certificates where authorization is only required for a parent domain. Baseline Requirements version 1.7.1 states:
 

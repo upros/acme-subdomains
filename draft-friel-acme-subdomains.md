@@ -37,18 +37,18 @@ informative:
     author:
       org: CA/Browser Forum
     title: Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates
-    target: https://cabforum.org/baseline-requirements-documents/
+    target: https://cabforum.org/wp-content/uploads/CA-Browser-Forum-BR-1.7.1.pdf
 
 --- abstract
 
-This document outlines how ACME can be used by a client to obtain a certificate for a subdomain identifier from a certificate authority. The client has fulfilled a challenge against a parent domain but does not need to fulfil a challenge against the explicit subdomain as certificate authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
+This document outlines how ACME can be used by a client to obtain a certificate for a subdomain identifier from a certification authority. The client has fulfilled a challenge against a parent domain but does not need to fulfil a challenge against the explicit subdomain as certificate policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
 
 --- middle
 
 
 # Introduction
 
-ACME {{?RFC8555}} defines a protocol that a certificate authority (CA) and an applicant can use to automate the process of domain name ownership validation and X.509 (PKIX) certificate issuance. This document outlines how ACME can be used to issue subdomain certificates, without requiring the ACME client to explicitly fulfil an ownership challenge against the subdomain identifiers - the ACME client need only fulfil an ownership challenge against a parent domain identifier.
+ACME {{?RFC8555}} defines a protocol that a certification authority (CA) and an applicant can use to automate the process of domain name ownership validation and X.509v3 (PKIX) {{?RFC5280}} certificate issuance. This document outlines how ACME can be used to issue subdomain certificates, without requiring the ACME client to explicitly fulfil an ownership challenge against the subdomain identifiers - the ACME client need only fulfil an ownership challenge against a parent domain identifier.
 
 # Terminology
 
@@ -58,13 +58,25 @@ ACME {{?RFC8555}} defines a protocol that a certificate authority (CA) and an ap
    14 {{?RFC2119}} {{?RFC8174}} when, and only when, they appear in all
    capitals, as shown here.
    
+The following terms are defined in the CA/Browser Baseline Requirements [CAB] and are reproduced here:
+
+- Base Domain Name: The portion of an applied-for FQDN that is the first domain name node left of a registry-controlled or public suffix plus the registry-controlled or public suffix (e.g. “example.co.uk” or “example.com”). For FQDNs where the right-most domain name node is a gTLD having ICANN Specification 13 in its registry agreement, the gTLD itself may be used as the Base Domain Name.
+
+- Domain Name: The label assigned to a node in the Domain Name System
+
+- Domain Namespace: The set of all possible Domain Names that are subordinate to a single node in the Domain Name System
+
 The following terms are used in this document:
 
-- CA: Certificate Authority
+- CA: Certification Authority
 
 - CSR: Certificate Signing Request
 
 - FQDN: Fully Qualified Domain Name
+
+- Parent Domain: a node in the Domain Name System that has a Domain Name
+
+- Subdomain: a Domain Name that is in the Domain Namespace of a given Parent Domain
 
 # ACME Workflow and Identifier Requirements
 
@@ -74,7 +86,7 @@ A typical ACME workflow for issuance of certificates is as follows:
 
 2. server replies with a set of "authorizations" and a "finalize" URI
 
-3. client sends POST-as-GET requests to retrieve the "authorizations", with the downloaded "authorization" object(s) containing the "identifier" that the client must prove control of
+3. client sends POST-as-GET requests to retrieve the "authorizations", with the downloaded "authorization" object(s) containing the "identifier" that the client must prove that they control
 
 4. client proves control over the "identifier" in the "authorization" object by completing the specified challenge, for example, by publishing a DNS TXT record
 
@@ -215,18 +227,18 @@ This document defines enhancements to the authorization and directory objects.
 
 ## Authorization Object
 
-If an ACME server allows issuance of certificates for subdomains of a parent domain, then the authorization object for the parent domain MUST include the optional "basedomain" field, with a value of true.
+If an ACME server allows issuance of certificates for subdomains of a parent domain, then the authorization object for the parent domain MUST include the optional "includeSubDomains" field, with a value of true.
 
 The structure of an ACME authorization resource is enhanced to include the following optional field:
 
-   basedomain (optional, boolean):  This field MUST be present and true
+   includeSubDomains (optional, boolean):  This field MUST be present and true
       for authorizations where ACME server policy allows certificates to
       to be issued for subdomains of the identifier in the authorization
       object without explicit authorization of the subdomain
 
 ## Directory Object Metadata
 
-An ACME server can advertise support of issuance of subdomain certificates by including the boolean field "implicitSubdomainAuthorization" in its "ACME Directory Metadata Fields" registry. If not specified, then no default value is assumed. If an ACME server supports issuance of subdomain certificates, it can indicate this by including this field with a value of "true".
+An ACME server can advertise support of issuance of subdomain certificates by including the boolean field "includeSubDomainsAuthorization" in its "ACME Directory Metadata Fields" registry. If not specified, then no default value is assumed. If an ACME server supports issuance of subdomain certificates, it can indicate this by including this field with a value of "true".
 
 # IANA Considerations
 
@@ -234,19 +246,20 @@ An ACME server can advertise support of issuance of subdomain certificates by in
 
 The following field is added to the "ACME Authorization Object Fields" registry defined in ACME {{?RFC8555}}.
 
-        +------------+-----------------+--------------+-----------+
-        | Field Name | Field Type      | Configurable | Reference |
-        +------------+-----------------+--------------+-----------+
-        | basedomain | boolean         | false        | RFC XXXX  |
-        +------------+-----------------+--------------+-----------+
+        +-------------------+------------+--------------+-----------+
+        | Field Name        | Field Type | Configurable | Reference |
+        +-------------------+------------+--------------+-----------+
+        | includeSubDomains | boolean    | false        | RFC XXXX  |
+        +-------------------+------------+--------------+-----------+
 
 ## Directory Object Metadata Fields Registry
 
 The following field is added to the "ACME Directory Metadata Fields" registry defined in ACME {{?RFC8555}}.
+
          +--------------------------------+------------+-----------+
          | Field Name                     | Field Type | Reference |
          +--------------------------------+------------+-----------+
-         | implicitSubdomainAuthorization | boolean    | RFC XXXX  |
+         | includeSubDomainsAuthorization | boolean    | RFC XXXX  |
          +--------------------------------+------------+-----------+
 
 # Security Considerations 

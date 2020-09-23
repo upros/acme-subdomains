@@ -112,7 +112,7 @@ ACME does not mandate that the "identifier" in a newOrder request matches the "i
 
 As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain.
 
-ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfil an authorization challenge for a parent domain of that subdomain. This allows a flow where a client proves ownership of, for example, "example.com" and then successfully obtains a certificate for "sub.example.com".
+ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfil an authorization challenge for a parent domain of that subdomain. This allows a flow where a client proves ownership of, for example, "example.org" and then successfully obtains a certificate for "sub.example.org".
 
 ACME server policy is out of scope of this document, however some commentary is provided in {{acme-server-policy-considerations}}.
 
@@ -135,14 +135,14 @@ The call flow illustrated here uses the ACME pre-authorization flow. The call fl
  STEP 1: Pre-Authorization of parent domain
     |                      |           |
     | POST /newAuthz       |           |
-    | "example.com"        |           |
+    | "example.org"        |           |
     |--------------------->|           |
     |                      |           |
     | 201 authorizations   |           |
     |<---------------------|           |
     |                      |           |
     | Publish DNS TXT      |           |
-    | "example.com"        |           |
+    | "example.org"        |           |
     |--------------------------------->|
     |                      |           |
     | POST /challenge      |           |
@@ -153,20 +153,20 @@ The call flow illustrated here uses the ACME pre-authorization flow. The call fl
     |<---------------------|           |
     |                      |           |
     | Delete DNS TXT       |           |
-    | "example.com"        |           |
+    | "example.org"        |           |
     |--------------------------------->|
     |                      |           |
  STEP 2: Place order for subdomain
     |                      |           |
     | POST /newOrder       |           |
-    | "sub.example.com"    |           |
+    | "sub.example.org"    |           |
     |--------------------->|           |
     |                      |           |
     | 201 status=ready     |           |
     |<---------------------|           |
     |                      |           |
     | POST /finalize       |           |
-    | CSR "sub.example.com"|           |
+    | CSR "sub.example.org"|           |
     |--------------------->|           |
     |                      |           |
     | 200 OK status=valid  |           |
@@ -176,7 +176,7 @@ The call flow illustrated here uses the ACME pre-authorization flow. The call fl
     |--------------------->|           |
     |                      |           |
     | 200 OK               |           |
-    | PKI "sub.example.com"|           |
+    | PKI "sub.example.org"|           |
     |<---------------------|           |
 
 ~~~
@@ -197,23 +197,23 @@ If a server has such a policy and a client is not authorized for the parent doma
 
 ## Examples
 
-In order to illustrate subdomain behaviour, let us assume that a client wishes to get certificates for subdomain identifiers "sub0.example.com", "sub1.example.com" and "sub2.example.com" under parent domain "example.com", and CA policy allows certificate issuance of these subdomain identifiers while only requiring the client to fulfil an ownership challenge for parent domain "example.com". Let us also assume that the client has not yet proven ownership of parent domain "example.com".
+In order to illustrate subdomain behaviour, let us assume that a client wishes to get certificates for subdomain identifiers "sub0.example.org", "sub1.example.org" and "sub2.example.org" under parent domain "example.org", and CA policy allows certificate issuance of these subdomain identifiers while only requiring the client to fulfil an ownership challenge for parent domain "example.org". Let us also assume that the client has not yet proven ownership of parent domain "example.org".
 
-1. The client POSTs a newOrder request for identifier "sub0.example.com"
+1. The client POSTs a newOrder request for identifier "sub0.example.org"
 
-    The server creates an authorization object for identifier "example.com". The server replies with a 201 (Created) response. The response body is an order object with status set to "pending" and a link to newly created authorization object against the parent domain "example.com". Therefore, the server is instructing the client to fulfil a challenge against domain identifier "example.com" in order to obtain a certificate including identifier "sub0.example.com".
+    The server creates an authorization object for identifier "example.org". The server replies with a 201 (Created) response. The response body is an order object with status set to "pending" and a link to newly created authorization object against the parent domain "example.org". Therefore, the server is instructing the client to fulfil a challenge against domain identifier "example.org" in order to obtain a certificate including identifier "sub0.example.org".
 
-    The client completes the challenge for "example.com", POSTs a CSR to the order finalize URI, and downloads the certificate.
+    The client completes the challenge for "example.org", POSTs a CSR to the order finalize URI, and downloads the certificate.
 
-2. The client POSTs a newOrder request for identifier "sub1.example.com"
+2. The client POSTs a newOrder request for identifier "sub1.example.org"
 
-    The server replies with a 201 (Created) response. The response body is an order object with status set to "ready" and a link to the unexpired authorization against the parent domain "example.com". 
+    The server replies with a 201 (Created) response. The response body is an order object with status set to "ready" and a link to the unexpired authorization against the parent domain "example.org". 
 
     The client POSTs a CSR to the order finalize URI, and downloads the certificate.
 
-3. The client POSTs a newAuthz request for identifier "sub2.example.com"
+3. The client POSTs a newAuthz request for identifier "sub2.example.org"
 
-    The server replies with a 200 (OK) response. The response body is the previously created authorization object for "example.com" with status set to "valid".
+    The server replies with a 200 (OK) response. The response body is the previously created authorization object for "example.org" with status set to "valid".
 
 # Resource Enhancements
 

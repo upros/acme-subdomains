@@ -108,6 +108,16 @@ ACME places the following restrictions on "identifiers":
 
 ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects.
 
+# Open Items
+
+1. Does the client need a mechanism to indicate that they want to authorize a parent domain and not the explicit subdomain identifier? Or a mechanism to indicate that they are happy to authorize against a choice of identifiers? E.g. for foo1.foo2.bar.example.com, should the client be able to specify anywhere from 1 to 4 identifiers they are willing to fulfil challenges for?
+
+2. Does the server need a mechanism to provide a choice of identifiers to the client and let the client chose which challenge to fulfil? E.g. for foo1.foo2.bar.example.com, should the server be able to specify anywhere from 1 to 4 identifiers that the client can pick from to fulfil?
+
+Both 1 and 2 would require changes to the JSON object definitions. For 1, each identifier in the newOrder or newAuthz requests would need a child array of alternative identifiers the client is willing to fulfil. For 2, the current order object contains a set of authorizations that must all be completed, the authorization object contains a single identifier that all challenges are against, so therefore its not possible for the server to give the client a choice of identifiers to pick from.
+
+This document does not currently define how 1 or 2 could be accomplished. This document merely defines how a client can submit a newOrder / newAuthz for one identifier (e.g. foo1.foo2.bar.example.com), and the server to choose a parent identifier (e.g. example.com) that it requires challenge fulfilment on, and specify that identifier in the authorization object.
+
 # ACME Issuance of Subdomain Certificates
 
 As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain.

@@ -294,7 +294,7 @@ Therefore, all Security Considerations in ACME in the following areas are equall
 
 - CA Policy Considerations 
 
-Some additional comments on ACME server opicy are given in the following section.
+Some additional comments on ACME server policy are given in the following section.
 
 ## ACME Server Policy Considerations
 

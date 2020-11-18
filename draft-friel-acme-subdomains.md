@@ -58,7 +58,7 @@ ACME {{?RFC8555}} defines a protocol that a certification authority (CA) and an 
    14 {{?RFC2119}} {{?RFC8174}} when, and only when, they appear in all
    capitals, as shown here.
    
-The following terms are defined in the CA/Browser Baseline Requirements [CAB] and are reproduced here:
+The following terms are defined in the CA/Browser Forum Baseline Requirements [CAB] and are reproduced here:
 
 - Base Domain Name: The portion of an applied-for FQDN that is the first domain name node left of a registry-controlled or public suffix plus the registry-controlled or public suffix (e.g. “example.co.uk” or “example.com”). For FQDNs where the right-most domain name node is a gTLD having ICANN Specification 13 in its registry agreement, the gTLD itself may be used as the Base Domain Name.
 

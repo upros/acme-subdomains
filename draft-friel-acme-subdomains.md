@@ -130,12 +130,12 @@ Clients need a mechanism to optionally indicate to servers whether or not they a
 
 This can be achieved by adding an optional boolean "parentDomainAuthorization" flag to the "identifiers" field in the order object. This boolean flag indicates whether the client has control of all parent ADNs and can fulfill challenges against all parent domains.
 
-In the following example, the client requests a certificate for identifier `www.example.org` and indicates that it can fulfill a challenge against the FQDN or the parent ADN. The server can then choose which of the ADNs to issue a challenge against.
+In the following example, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the FQDN or any of the parent ADNs `bar.example.org` or `example.org`. The server can then choose which of the ADNs to issue a challenge against.
 
 ~~~
   {
     "identifiers": [
-      { "type": "dns", "value": "www.example.org", "parentDomainAuthorization": true }
+      { "type": "dns", "value": "foo.bar.example.org", "parentDomainAuthorization": true }
     ],
     "notBefore": "2016-01-01T00:04:00+04:00",
     "notAfter": "2016-01-08T00:04:00+04:00"
@@ -161,31 +161,19 @@ If a client does not explicitly specify a value for "parentDomainAuthorization",
 [TODO] Is this granular enough? Is there any need for a client to be able to specify a subset of parent ADNs it has control over? e.g. if a client wants a cert for "foo.bar.example.org" and has control over "bar.example.org" but not "example.org".
 
 ~~~
-   POST /acme/new-order HTTP/1.1
-   Host: example.com
-   Content-Type: application/jose+json
-
-   {
-     "protected": base64url({
-       "alg": "ES256",
-       "kid": "https://example.com/acme/acct/evOfKhNU60wg",
-       "nonce": "5XJ1L3lEkMG7tR6pA00clA",
-       "url": "https://example.com/acme/new-order"
-     }),
-     "payload": base64url({
-       "identifiers": [
-         { "type": "dns",
-           "value": "foo.bar.example.org"
-           "adns": [
-             "foo.bar.example.org",
-             "bar.example.org"]
-         }
-       ],
-       "notBefore": "2016-01-01T00:04:00+04:00",
-       "notAfter": "2016-01-08T00:04:00+04:00"
-     }),
-     "signature": "H6ZXtGjTZyUnPeKn...wEA4TklBdh3e454g"
-   }
+  {
+    "identifiers": [
+      { "type": "dns",
+        "value": "foo.bar.example.org"
+        "adns": [
+          "foo.bar.example.org",
+          "bar.example.org"
+        ]
+      }
+    ],
+    "notBefore": "2016-01-01T00:04:00+04:00",
+    "notAfter": "2016-01-08T00:04:00+04:00"
+  }
 ~~~
 
 

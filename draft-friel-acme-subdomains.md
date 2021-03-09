@@ -62,6 +62,8 @@ The following terms are defined in the CA/Browser Forum Baseline Requirements [C
 
 - Base Domain Name: The portion of an applied-for FQDN that is the first domain name node left of a registry-controlled or public suffix plus the registry-controlled or public suffix (e.g. “example.co.uk” or “example.com”). For FQDNs where the right-most domain name node is a gTLD having ICANN Specification 13 in its registry agreement, the gTLD itself may be used as the Base Domain Name.
 
+- ADN: Authorization Domain Name. The Domain Name used to obtain authorization for certificate issuance for a given FQDN.
+
 - Domain Name: The label assigned to a node in the Domain Name System
 
 - Domain Namespace: The set of all possible Domain Names that are subordinate to a single node in the Domain Name System
@@ -125,6 +127,75 @@ As noted in the previous section, ACME does not mandate that the "identifier" in
 ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfil an authorization challenge for a parent domain of that subdomain. This allows a flow where a client proves ownership of, for example, "example.org" and then successfully obtains a certificate for "sub.example.org".
 
 ACME server policy is out of scope of this document, however some commentary is provided in {{acme-server-policy-considerations}}.
+
+## ACME Challenge Type
+
+ACME for subdomains is restricted for use with "dns-01" challenges. If a server policy allows a client to fulfil a challenge against a parent ADN of a requested certificate FQDN identifier, then the server MUST issue a "dns-01" challenge against that parent ADN.
+
+## Domain Control Indication
+
+Clients need a mechanism to optionally indicate to servers the ADNs that they are authorized to fulfil challenges against for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, but the client is not authorized to update DNS TXT records against the parent ADNs `bar.example.org` or `example.org`, then we want to avoid the server sending a challenge against these ADNs.
+
+This can be achieved by enhancing the order object and allowing the client to specify which ADNs are available for authorization fulfilment. The "identifiers" field in the order object is enhanced to optionally include the ADNs that the client can fulfil challenges against.
+
+In the following example, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfil a challenge against the FQDN or any of the parent ADNs. The server can then chose which of the ADNs to issue a challenge against.
+
+~~~
+   POST /acme/new-order HTTP/1.1
+   Host: example.com
+   Content-Type: application/jose+json
+
+   {
+     "protected": base64url({
+       "alg": "ES256",
+       "kid": "https://example.com/acme/acct/evOfKhNU60wg",
+       "nonce": "5XJ1L3lEkMG7tR6pA00clA",
+       "url": "https://example.com/acme/new-order"
+     }),
+     "payload": base64url({
+       "identifiers": [
+         { "type": "dns",
+           "value": "foo.bar.example.org"
+           "adns": [
+             "foo.bar.example.org",
+             "bar.example.org",
+             "example.org"]
+         }
+       ],
+       "notBefore": "2016-01-01T00:04:00+04:00",
+       "notAfter": "2016-01-08T00:04:00+04:00"
+     }),
+     "signature": "H6ZXtGjTZyUnPeKn...wEA4TklBdh3e454g"
+   }
+~~~
+
+[TODO] Is this too complex and instead would it be better for the client to set a flag indicating that it can only fulfil a chalenge against the requested FQDN, and not against any parent ADNs? e.g.
+
+~~~
+   POST /acme/new-order HTTP/1.1
+   Host: example.com
+   Content-Type: application/jose+json
+
+   {
+     "protected": base64url({
+       "alg": "ES256",
+       "kid": "https://example.com/acme/acct/evOfKhNU60wg",
+       "nonce": "5XJ1L3lEkMG7tR6pA00clA",
+       "url": "https://example.com/acme/new-order"
+     }),
+     "payload": base64url({
+       "identifiers": [
+         { "type": "dns",
+           "value": "foo.bar.example.org"
+           "parentADNauthorization": true
+         }
+       ],
+       "notBefore": "2016-01-01T00:04:00+04:00",
+       "notAfter": "2016-01-08T00:04:00+04:00"
+     }),
+     "signature": "H6ZXtGjTZyUnPeKn...wEA4TklBdh3e454g"
+   }
+~~~
 
 ## Pre-Authorization
 

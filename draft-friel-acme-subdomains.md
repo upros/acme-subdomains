@@ -2,7 +2,7 @@
 stand_alone: yes
 title: "ACME for Subdomains"
 abbrev: ACME-SUBDOMAINS
-docname: draft-friel-acme-subdomains-02
+docname: draft-friel-acme-subdomains-04
 cat: std
 coding: utf-8
 pi:

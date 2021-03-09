@@ -100,6 +100,8 @@ A typical ACME workflow for issuance of certificates is as follows:
 
 ACME places the following restrictions on "identifiers":
 
+- section 7.1.3: The authorizations required are dictated by server policy; there may not be a 1:1 relationship between the order identifiers and the authorizations required.
+
 - section 7.1.4: the only type of "identifier" defined by the ACME specification is a fully qualified domain name: "The only type of identifier defined by this specification is a fully qualified domain name (type: "dns"). The domain name MUST be encoded in the form in which it would appear in a certificate."
 
 - Section 7.4: the "identifier" in the CSR request must match the "identifier" in the newOrder request: "The CSR MUST indicate the exact same set of requested identifiers as the initial newOrder request."
@@ -132,13 +134,40 @@ ACME server policy is out of scope of this document, however some commentary is 
 
 ACME for subdomains is restricted for use with "dns-01" challenges. If a server policy allows a client to fulfil a challenge against a parent ADN of a requested certificate FQDN identifier, then the server MUST issue a "dns-01" challenge against that parent ADN.
 
-## Domain Control Indication
+## Parent Domain Control Indication
 
-Clients need a mechanism to optionally indicate to servers the ADNs that they are authorized to fulfil challenges against for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, but the client is not authorized to update DNS TXT records against the parent ADNs `bar.example.org` or `example.org`, then we want to avoid the server sending a challenge against these ADNs.
+Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfil challenges against parent ADNs for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, but the client is not authorized to update DNS TXT records against the parent ADNs `bar.example.org` or `example.org`, then we want to avoid the server sending a challenge against those ADNs.
 
-This can be achieved by enhancing the order object and allowing the client to specify which ADNs are available for authorization fulfilment. The "identifiers" field in the order object is enhanced to optionally include the ADNs that the client can fulfil challenges against.
+This can be achieved by adding an optional boolean "parentDomainAuthorization" flag to the "identifiers" field in the order object. This boolean flag indicates whether the client has control of all parent ADNs and can fulfil challenges against all parent domains.
 
 In the following example, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfil a challenge against the FQDN or any of the parent ADNs. The server can then chose which of the ADNs to issue a challenge against.
+
+~~~
+  {
+    "identifiers": [
+      { "type": "dns", "value": "www.example.org", "parentDomainAuthorization": true },
+      { "type": "dns", "value": "example.org", "parentDomainAuthorization": true }
+    ],
+    "notBefore": "2016-01-01T00:04:00+04:00",
+    "notAfter": "2016-01-08T00:04:00+04:00"
+   }
+~~~
+
+If the client is unable to fulfil, authorizations against parent ADNs, the client should include this flag set to `false`. When a server receives an order with this flag set against an identifier, it MUST NOT issue an authorization challenge against any of the identifier's parent ADNs.
+
+For example, if a client places an order for `foo.bar.example.org` but does not have control over parent domains `bar.example.org` or `example.org`, the client should send the following order object:
+
+~~~
+  {
+    "identifiers": [
+      { "type": "dns", "value": "foo.bar.example.org", "parentDomainAuthorization": false },
+    ],
+    "notBefore": "2016-01-01T00:04:00+04:00",
+    "notAfter": "2016-01-08T00:04:00+04:00"
+   }
+~~~
+
+[TODO] Is this granular enough? Is there any need for a client to be able to specify a subset of parent ADNs it has contorl over? e.g. if a client wants a cert for "foo.bar.example.org" and has control over "bar.example.org" but not "example.org".
 
 ~~~
    POST /acme/new-order HTTP/1.1
@@ -158,8 +187,7 @@ In the following example, the client requests a certificate for identifier `foo.
            "value": "foo.bar.example.org"
            "adns": [
              "foo.bar.example.org",
-             "bar.example.org",
-             "example.org"]
+             "bar.example.org"]
          }
        ],
        "notBefore": "2016-01-01T00:04:00+04:00",
@@ -169,33 +197,6 @@ In the following example, the client requests a certificate for identifier `foo.
    }
 ~~~
 
-[TODO] Is this too complex and instead would it be better for the client to set a flag indicating that it can only fulfil a chalenge against the requested FQDN, and not against any parent ADNs? e.g.
-
-~~~
-   POST /acme/new-order HTTP/1.1
-   Host: example.com
-   Content-Type: application/jose+json
-
-   {
-     "protected": base64url({
-       "alg": "ES256",
-       "kid": "https://example.com/acme/acct/evOfKhNU60wg",
-       "nonce": "5XJ1L3lEkMG7tR6pA00clA",
-       "url": "https://example.com/acme/new-order"
-     }),
-     "payload": base64url({
-       "identifiers": [
-         { "type": "dns",
-           "value": "foo.bar.example.org"
-           "parentADNauthorization": true
-         }
-       ],
-       "notBefore": "2016-01-01T00:04:00+04:00",
-       "notAfter": "2016-01-08T00:04:00+04:00"
-     }),
-     "signature": "H6ZXtGjTZyUnPeKn...wEA4TklBdh3e454g"
-   }
-~~~
 
 ## Pre-Authorization
 
@@ -264,23 +265,23 @@ The call flow illustrated here uses the ACME pre-authorization flow. The call fl
 
 ## newOrder and newAuthz Handling
 
-Servers may consider validation of a parent domain sufficient authorization for a subdomain. If a server has such a policy and a client is already authorized for the parent domain then:
+Servers may consider validation of a parent domain sufficient authorization for a subdomain. If a server has such a policy and a client has already fulfiled an authorization challenge for the parent domain then:
 
 - If the client submits a newAuthz request for a subdomain: The server MUST return status 200 (OK) response. The response body is the existing authorization object for the parent domain with status set to "valid".
 
 - If the client submits a newOrder request for a subdomain: The server MUST return a 201 (Created) response. The response body is an order object with status set to "ready" and links to the unexpired authorizations against the parent domain.
 
-If a server has such a policy and a client is not authorized for the parent domain then:
+If a server has such a policy and a client has not fulfiled an authorizion challenge for the parent domain then:
 
-- If the client submits a newAuthz request for a subdomain: The server MUST return a status 201 (Created) response. The response body is a newly created authorization object for the parent domain with status set to "pending".
+- If the client submits a newAuthz request for a subdomain: The server MUST return a status 201 (Created) response. If the client indicates that it has control over the parent domains by including the "parentDomainAuthorization" value of `true`, then the response body is a newly created authorization object, and server policy dictates whether the authorizaton object is for the subdomain identifier, or one of the parent domains. If the client indicates that it does not have control over the parent domain by including the "parentDomainAuthorization" value of `false`, then server MUST return an authorization object for the specified identifier, and not for a parent domain.
 
-- If the client submits a newOrder request for a subdomain: The server MUST return a status 201 (Created) response. The response body is an order object with status set to "pending" and links to newly created authorizations objects against the parent domain.
+- If the client submits a newOrder request for a subdomain: The server MUST return a status 201 (Created) response. If the client indicates that it has control over the parent domains by including the "parentDomainAuthorization" value of `true`, then the response body is an order object with status set to "pending" and links to newly created authorizations object, and server policy dictates whether the authorizaton object is for the subdomain identifier, or one of the parent domains. If the client indicates that it does not have control over the parent domain by including the "parentDomainAuthorization" value of `false`, then server MUST return an authorization object for the specified identifier, and not for a parent domain.
 
 ## Examples
 
 In order to illustrate subdomain behaviour, let us assume that a client wishes to get certificates for subdomain identifiers "sub0.example.org", "sub1.example.org" and "sub2.example.org" under parent domain "example.org", and CA policy allows certificate issuance of these subdomain identifiers while only requiring the client to fulfil an ownership challenge for parent domain "example.org". Let us also assume that the client has not yet proven ownership of parent domain "example.org".
 
-1. The client POSTs a newOrder request for identifier "sub0.example.org"
+1. The client POSTs a newOrder request for identifier "sub0.example.org" and includes a "parentDomainAuthorization" value of `true`
 
     The server creates an authorization object for identifier "example.org". The server replies with a 201 (Created) response. The response body is an order object with status set to "pending" and a link to newly created authorization object against the parent domain "example.org". Therefore, the server is instructing the client to fulfil a challenge against domain identifier "example.org" in order to obtain a certificate including identifier "sub0.example.org".
 
@@ -311,6 +312,15 @@ The structure of an ACME authorization resource is enhanced to include the follo
       to be issued for subdomains of the identifier in the authorization
       object without explicit authorization of the subdomain
 
+## Identifier Object
+
+The "Identifier" object which can be included in requests to newAuthz resource, and in order objects, is enhanced to include the following optional field:
+
+   parentDomainAuthorization (optional, boolean):  Clients include this
+      field to indicat if they have control over parent domains for the
+      specified identifier and are able to fulfil challenges against
+      parent domains of the identifier
+      
 ## Directory Object Metadata
 
 An ACME server can advertise support of issuance of subdomain certificates by including the boolean field "includeSubDomainsAuthorization" in its "ACME Directory Metadata Fields" registry. If not specified, then no default value is assumed. If an ACME server supports issuance of subdomain certificates, it can indicate this by including this field with a value of "true".

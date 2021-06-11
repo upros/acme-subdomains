@@ -124,58 +124,37 @@ ACME server policy is out of scope of this document, however some commentary is 
 
 ACME for subdomains is restricted for use with "dns-01" challenges. If a server policy allows a client to fulfill a challenge against a parent ADN of a requested certificate FQDN identifier, then the server MUST issue a "dns-01" challenge against that parent ADN.
 
-## Parent Domain Control Indication
+## Parent Domain Authorization Indication
 
-Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against parent ADNs for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, but the client is not authorized to update DNS TXT records against the parent ADNs `bar.example.org` or `example.org`, then we want to avoid the server sending a challenge against those ADNs.
+Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against parent ADNs for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to update DNS TXT records against the parent ADNs `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent ADNs to the ACME server.
 
-This can be achieved by adding an optional boolean "parentDomainAuthorization" flag to the "identifiers" field in the order object. This boolean flag indicates whether the client has control of all parent ADNs and can fulfill challenges against all parent domains.
+This can be achieved by adding an optional field "authorizedNamespace" to the "identifiers" field in the order object. This field specifies the ADN of the Domain Namespace that the client has DNS control over, and is capable of fulfilling challenges against. The server can choose to issue a challenge against any parent domain of the identifier in the Domain Namespace up to and including the specified "authorizedNamespace".
 
-In the following example, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the FQDN or any of the parent ADNs `bar.example.org` or `example.org`. The server can then choose which of the ADNs to issue a challenge against.
+In the following example, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace under `bar.example.org`. The server can then choose to issue a challenge against against either `foo.bar.example.org` or `bar.example.org`.
 
 ~~~
   {
     "identifiers": [
-      { "type": "dns", "value": "foo.bar.example.org", "parentDomainAuthorization": true }
+      { "type": "dns", "value": "foo.bar.example.org", "authorizedNamespace": "bar.example.org" }
     ],
     "notBefore": "2016-01-01T00:04:00+04:00",
     "notAfter": "2016-01-08T00:04:00+04:00"
    }
 ~~~
 
-If the client is unable to fulfill, authorizations against parent ADNs, the client should include this flag set to `false`. When a server receives an order with this flag set against an identifier, it MUST NOT issue an authorization challenge against any of the identifier's parent ADNs.
-
-For example, if a client places an order for `foo.bar.example.org` but does not have control over parent domains `bar.example.org` or `example.org`, the client should send the following order object:
+In the following example, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace under `example.org`. The server can then choose to issue a challenge against against any one of `foo.bar.example.org`, `bar.example.org` or `example.org`.
 
 ~~~
   {
     "identifiers": [
-      { "type": "dns", "value": "foo.bar.example.org", "parentDomainAuthorization": false },
+      { "type": "dns", "value": "foo.bar.example.org", "authorizedNamespace": "example.org" }
     ],
     "notBefore": "2016-01-01T00:04:00+04:00",
     "notAfter": "2016-01-08T00:04:00+04:00"
    }
 ~~~
 
-If a client does not explicitly specify a value for "parentDomainAuthorization", then no default value is assumed.
-
-[TODO] Is this granular enough? Is there any need for a client to be able to specify a subset of parent ADNs it has control over? e.g. if a client wants a cert for "foo.bar.example.org" and has control over "bar.example.org" but not "example.org".
-
-~~~
-  {
-    "identifiers": [
-      { "type": "dns",
-        "value": "foo.bar.example.org"
-        "adns": [
-          "foo.bar.example.org",
-          "bar.example.org"
-        ]
-      }
-    ],
-    "notBefore": "2016-01-01T00:04:00+04:00",
-    "notAfter": "2016-01-08T00:04:00+04:00"
-  }
-~~~
-
+If the client is unable to fulfill authorizations against parent ADNs, the client should not include the "authorizedNamespace" field.
 
 ## Pre-Authorization
 

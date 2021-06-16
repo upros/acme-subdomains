@@ -272,6 +272,8 @@ The structure of an ACME authorization resource is enhanced to include the follo
 
 ## Identifier Object
 
+[TODO]: NEED TO UPDATE
+
 The "Identifier" object which can be included in requests to newAuthz resource, and in order objects, is enhanced to include the following optional field:
 
    parentDomainAuthorization (optional, boolean):  Clients include this

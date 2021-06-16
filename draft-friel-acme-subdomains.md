@@ -223,6 +223,8 @@ The call flow illustrated here uses the ACME pre-authorization flow. The call fl
 
 ## newOrder and newAuthz Handling
 
+[TODO] FIXUP FIELD NAMES
+
 Servers may consider validation of a parent domain sufficient authorization for a subdomain. If a server has such a policy and a client has already fulfilled an authorization challenge for the parent domain then:
 
 - If the client submits a newAuthz request for a subdomain: The server MUST return status 200 (OK) response. The response body is the existing authorization object for the parent domain with status set to "valid".

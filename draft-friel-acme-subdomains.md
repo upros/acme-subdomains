@@ -128,13 +128,15 @@ ACME for subdomains is restricted for use with "dns-01" challenges. If a server 
 
 Clients need a mechanism to instruct the ACME server that they are requesting authorization for a Domain Namespace under a given ADN, as opposed to just requesting authorization for an explicit ADN identifier. Clients need a mechanism to do this in both newAuthz and newOrder requests. ACME servers need a mechanism to indicate to clients that authorization objects are valid for an entire Domain Namespace. These are described in this section.
 
-## Pre-Authorization
+### Pre-Authorization
 
 The standard ACME workflow has authorization objects created reactively in response to a certificate order. ACME also allows for pre-authorization, where clients obtain authorization for an identifier proactively, outside of the context of a specific issuance. With the ACME pre-authorization flow, a client can pre-authorize for a parent ADN once, and then issue multiple newOrder requests for certificates with identifiers in the Domain Namespace under that ADN.
 
 ACME {{?RFC8555}} section 7.4.1 defines the "identifier" object for newAuthz requests. One additional field for the "identifier" object is defined:
 
-  domainNamespace (optional, boolean): clients sets this flag to indicate to the server that it is requesting an authorizaton for the full Domain Namespace under the specified identifier value
+~~~
+domainNamespace (optional, boolean): clients sets this flag to indicate to the server that it is requesting an authorizaton for the full Domain Namespace under the specified identifier value
+~~~
   
 In the following example, the client is requesting pre-authorization for the entire Domain Namespace under "example.org".
 
@@ -163,15 +165,17 @@ In the following example, the client is requesting pre-authorization for the ent
 
 It may make sense to use the ACME pre-authorization flow for the subdomain use case, however, that is an operator implementation and deployment decision. 
 
-## New Orders
+### New Orders
 
 Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against parent ADNs for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to update DNS TXT records against the parent ADNs `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent ADNs to the ACME server.
 
-This can be achieved by adding an optional field "authorizedNamespace" to the "identifiers" field in the order object:
+This can be achieved by adding an optional field "domainNamespace" to the "identifiers" field in the order object:
 
-  authorizedNamespace (optional, string): the ADN of the Domain Namespace that the client has control over
+~~~
+domainNamespace (optional, string): the ADN of the Domain Namespace that the client has control over
+~~~
 
-This field specifies the ADN of the Domain Namespace that the client has DNS control over, and is capable of fulfilling challenges against. The server can choose to issue a challenge against any parent domain of the identifier in the Domain Namespace up to and including the specified "authorizedNamespace".
+This field specifies the ADN of the Domain Namespace that the client has DNS control over, and is capable of fulfilling challenges against. The server can choose to issue a challenge against any parent domain of the identifier in the Domain Namespace up to and including the specified "domainNamespace", and create a corresponding authorization object against the chosen identifer.
 
 In the following example, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace under `bar.example.org`. The server can then choose to issue a challenge against against either `foo.bar.example.org` or `bar.example.org`.
 
@@ -199,7 +203,13 @@ In the following example, the client requests a certificate for identifier `foo.
 
 If the client is unable to fulfill authorizations against parent ADNs, the client should not include the "authorizedNamespace" field.
 
-## Authorization Object
+### Authorization Object
+
+When an ACME server policy allows authorization for Domain Namespaces for an identifier, the server can indicate this ny including the "domainNamespace" field in the authorizaton object:
+
+~~~
+domainNamespace (optional, boolean): servers sets this flag to true in authorization objects to indicate that the authorization covers the full Domain Namespace under the specified identifier
+~~~
 
 ## Illustrative Call Flow
 

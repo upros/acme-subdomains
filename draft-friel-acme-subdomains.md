@@ -205,15 +205,41 @@ If the client is unable to fulfill authorizations against parent ADNs, the clien
 
 ### Authorization Object
 
-When an ACME server policy allows authorization for Domain Namespaces for an identifier, the server can indicate this ny including the "domainNamespace" field in the authorizaton object:
+When an ACME server policy allows authorization for Domain Namespaces for an identifier, the server can indicate this by including the "domainNamespace" field in the authorizaton object:
 
 ~~~
 domainNamespace (optional, boolean): servers sets this flag to true in authorization objects to indicate that the authorization covers the full Domain Namespace under the specified identifier
 ~~~
 
+The following example shows an authorization object for the ADN "example.org" where the authoirzation covers the Domain Namespace under "example.org".
+
+~~~
+   {
+     "status": "valid",
+     "expires": "2015-03-01T14:09:07.99Z",
+
+     "identifier": {
+       "type": "dns",
+       "value": "example.org"
+     },
+
+     "challenges": [
+       {
+         "url": "https://example.com/acme/chall/prV_B7yEyA4",
+         "type": "http-01",
+         "status": "valid",
+         "token": "DGyRejmCefe7v4NfDGDKfA",
+         "validated": "2014-12-01T12:05:58.16Z"
+       }
+     ],
+
+     "domainNamespace": true
+   }
+~~~
+
 ## Illustrative Call Flow
 
-The call flow illustrated here uses the ACME pre-authorization flow. The call flow also illustrates the DNS-based proof of ownership mechanism, but the subdomain workflow is equally valid for HTTP based proof of ownership.
+The call flow illustrated here uses the ACME pre-authorization flow. The call flow also illustrates the DNS-based proof of ownership mechanism.
 
 ~~~
 
@@ -312,27 +338,31 @@ This document defines enhancements to the authorization and directory objects.
 
 ## Authorization Object
 
-If an ACME server allows issuance of certificates for subdomains of a parent domain, then the authorization object for the parent domain MUST include the optional "includeSubDomains" field, with a value of true.
+If an ACME server allows issuance of certificates for subdomains of a parent domain, then the authorization object for the parent domain MUST include the optional "domainNamespace" field, with a value of true.
 
-The structure of an ACME authorization resource is enhanced to include the following optional field:
+The structure of an ACME authorization object is enhanced to include the following optional field:
 
-   includeSubDomains (optional, boolean):  This field MUST be present and true
+~~~
+   domainNamespace (optional, boolean):  This field MUST be present and true
       for authorizations where ACME server policy allows certificates
       to be issued for subdomains of the identifier in the authorization
       object without explicit authorization of the subdomain
+~~~
 
 ## Identifier Object
 
 [TODO]: NEED TO UPDATE
 
-The "Identifier" object which can be included in requests to newAuthz resource, and in order objects, is enhanced to include the following optional field:
+The "identifier" object which can be included in requests to newAuthz resource, and in order objects, is enhanced to include the following optional field:
 
-   parentDomainAuthorization (optional, boolean):  Clients include this
+~~~
+   domainNamespace (optional, string):  Clients include this
       field to indicate if they have control over parent domains for the
       specified identifier and are able to fulfill challenges against
       parent domains of the identifier. If not specified, then no default
       value is assumed
-      
+~~~
+
 ## Directory Object Metadata
 
 An ACME server can advertise support of issuance of subdomain certificates by including the boolean field "includeSubDomainsAuthorization" in its "ACME Directory Metadata Fields" registry. If not specified, then no default value is assumed. If an ACME server supports issuance of subdomain certificates, it can indicate this by including this field with a value of "true".
@@ -343,21 +373,21 @@ An ACME server can advertise support of issuance of subdomain certificates by in
 
 The following field is added to the "ACME Authorization Object Fields" registry defined in ACME {{?RFC8555}}.
 
-        +-------------------+------------+--------------+-----------+
-        | Field Name        | Field Type | Configurable | Reference |
-        +-------------------+------------+--------------+-----------+
-        | includeSubDomains | boolean    | false        | RFC XXXX  |
-        +-------------------+------------+--------------+-----------+
+        +-----------------+------------+--------------+-----------+
+        | Field Name      | Field Type | Configurable | Reference |
+        +-----------------+------------+--------------+-----------+
+        | domainNamespace | boolean    | false        | RFC XXXX  |
+        +-----------------+------------+--------------+-----------+
 
 ## Directory Object Metadata Fields Registry
 
 The following field is added to the "ACME Directory Metadata Fields" registry defined in ACME {{?RFC8555}}.
 
-         +--------------------------------+------------+-----------+
-         | Field Name                     | Field Type | Reference |
-         +--------------------------------+------------+-----------+
-         | includeSubDomainsAuthorization | boolean    | RFC XXXX  |
-         +--------------------------------+------------+-----------+
+         +-----------------+------------+-----------+
+         | Field Name      | Field Type | Reference |
+         +-----------------+------------+-----------+
+         | domainNamespace | boolean    | RFC XXXX  |
+         +-----------------+------------+-----------+
 
 # Security Considerations 
 

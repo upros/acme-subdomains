@@ -162,6 +162,7 @@ The following example shows an authorization object for the ADN "example.org" wh
    }
 ~~~
 
+If the "domainNamespace" field is not included, then the assumed default value is false. 
 
 ### Pre-Authorization
 
@@ -198,7 +199,7 @@ In the following example, the client is requesting pre-authorization for the ent
    }
 ~~~
 
-It may make sense to use the ACME pre-authorization flow for the subdomain use case, however, that is an operator implementation and deployment decision. 
+If the server is willing to allow authorizations for the full Domain Namespace, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "domainNamespace" flag with value of true. If the server policy does not allow creation of Domain Namespace authorizations against that ADN, the server can  create an authorization object for the indicated identifier, and include the "domainNamespace" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
 
 ### New Orders
 
@@ -217,7 +218,7 @@ In the following example, the client requests a certificate for identifier `foo.
 ~~~
   {
     "identifiers": [
-      { "type": "dns", "value": "foo.bar.example.org", "authorizedNamespace": "bar.example.org" }
+      { "type": "dns", "value": "foo.bar.example.org", "domainNamespace": "bar.example.org" }
     ],
     "notBefore": "2016-01-01T00:04:00+04:00",
     "notAfter": "2016-01-08T00:04:00+04:00"
@@ -229,14 +230,16 @@ In the following example, the client requests a certificate for identifier `foo.
 ~~~
   {
     "identifiers": [
-      { "type": "dns", "value": "foo.bar.example.org", "authorizedNamespace": "example.org" }
+      { "type": "dns", "value": "foo.bar.example.org", "domainNamespace": "example.org" }
     ],
     "notBefore": "2016-01-01T00:04:00+04:00",
     "notAfter": "2016-01-08T00:04:00+04:00"
    }
 ~~~
 
-If the client is unable to fulfill authorizations against parent ADNs, the client should not include the "authorizedNamespace" field.
+If the client is unable to fulfill authorizations against parent ADNs, the client should not include the "domainNamespace" field.
+
+Server newOrder handling generally follows the process documented ACME section 7.4. If the server is willing to allow Domain Namespace authorizations for the ADN specified in "domainNamespace", then it creates an authorization object against that ADN and includes the "domainNamespace" flag with a value of true. If the server policy does not allow creation of Domain Namespace authorizations against that ADN, then it can create an authorization object for the indicated identifier value, and include the "domainNamespace" flag with value of false.
 
 ## Illustrative Call Flow
 
@@ -303,15 +306,11 @@ The call flow illustrated here uses the ACME pre-authorization flow. The call fl
 
 Servers may consider validation of a parent domain sufficient authorization for a subdomain. If a server has such a policy and a client has already fulfilled an authorization challenge for the parent domain then:
 
-- If the client submits a newAuthz request for a subdomain: The server MUST return status 200 (OK) response. The response body is the existing authorization object for the parent domain with status set to "valid".
-
 - If the client submits a newOrder request for a subdomain: The server MUST return a 201 (Created) response. The response body is an order object with status set to "ready" and links to the unexpired authorizations against the parent domain.
 
 If a server has such a policy and a client has not fulfilled an authorization challenge for the parent domain then:
 
 - If the client submits a newAuthz request for a subdomain: The server MUST return a status 201 (Created) response. If the client indicates that it has control over the parent domains by including the "parentDomainAuthorization" value of `true`, then the response body is a newly created authorization object, and server policy dictates whether the authorization object is for the subdomain identifier, or one of the parent domains. If the client indicates that it does not have control over the parent domain by including the "parentDomainAuthorization" value of `false`, then server MUST return an authorization object for the specified identifier, and not for a parent domain.
-
-- If the client submits a newOrder request for a subdomain: The server MUST return a status 201 (Created) response. If the client indicates that it has control over the parent domains by including the "parentDomainAuthorization" value of `true`, then the response body is an order object with status set to "pending" and links to newly created authorizations object, and server policy dictates whether the authorization object is for the subdomain identifier, or one of the parent domains. If the client indicates that it does not have control over the parent domain by including the "parentDomainAuthorization" value of `false`, then server MUST return an authorization object for the specified identifier, and not for a parent domain.
 
 ## Examples
 

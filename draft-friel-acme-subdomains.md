@@ -128,6 +128,41 @@ ACME for subdomains is restricted for use with "dns-01" challenges. If a server 
 
 Clients need a mechanism to instruct the ACME server that they are requesting authorization for a Domain Namespace under a given ADN, as opposed to just requesting authorization for an explicit ADN identifier. Clients need a mechanism to do this in both newAuthz and newOrder requests. ACME servers need a mechanism to indicate to clients that authorization objects are valid for an entire Domain Namespace. These are described in this section.
 
+### Authorization Object
+
+When an ACME server policy allows authorization for Domain Namespaces for an identifier, the server can indicate this by including the "domainNamespace" field in the authorizaton object:
+
+~~~
+domainNamespace (optional, boolean): servers sets this flag to true in authorization objects to indicate that the authorization covers the full Domain Namespace under the specified identifier
+~~~
+
+The following example shows an authorization object for the ADN "example.org" where the authorization covers the Domain Namespace under "example.org".
+
+~~~
+   {
+     "status": "valid",
+     "expires": "2015-03-01T14:09:07.99Z",
+
+     "identifier": {
+       "type": "dns",
+       "value": "example.org"
+     },
+
+     "challenges": [
+       {
+         "url": "https://example.com/acme/chall/prV_B7yEyA4",
+         "type": "http-01",
+         "status": "valid",
+         "token": "DGyRejmCefe7v4NfDGDKfA",
+         "validated": "2014-12-01T12:05:58.16Z"
+       }
+     ],
+
+     "domainNamespace": true
+   }
+~~~
+
+
 ### Pre-Authorization
 
 The standard ACME workflow has authorization objects created reactively in response to a certificate order. ACME also allows for pre-authorization, where clients obtain authorization for an identifier proactively, outside of the context of a specific issuance. With the ACME pre-authorization flow, a client can pre-authorize for a parent ADN once, and then issue multiple newOrder requests for certificates with identifiers in the Domain Namespace under that ADN.
@@ -202,40 +237,6 @@ In the following example, the client requests a certificate for identifier `foo.
 ~~~
 
 If the client is unable to fulfill authorizations against parent ADNs, the client should not include the "authorizedNamespace" field.
-
-### Authorization Object
-
-When an ACME server policy allows authorization for Domain Namespaces for an identifier, the server can indicate this by including the "domainNamespace" field in the authorizaton object:
-
-~~~
-domainNamespace (optional, boolean): servers sets this flag to true in authorization objects to indicate that the authorization covers the full Domain Namespace under the specified identifier
-~~~
-
-The following example shows an authorization object for the ADN "example.org" where the authoirzation covers the Domain Namespace under "example.org".
-
-~~~
-   {
-     "status": "valid",
-     "expires": "2015-03-01T14:09:07.99Z",
-
-     "identifier": {
-       "type": "dns",
-       "value": "example.org"
-     },
-
-     "challenges": [
-       {
-         "url": "https://example.com/acme/chall/prV_B7yEyA4",
-         "type": "http-01",
-         "status": "valid",
-         "token": "DGyRejmCefe7v4NfDGDKfA",
-         "validated": "2014-12-01T12:05:58.16Z"
-       }
-     ],
-
-     "domainNamespace": true
-   }
-~~~
 
 ## Illustrative Call Flow
 

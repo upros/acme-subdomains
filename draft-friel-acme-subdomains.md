@@ -130,12 +130,7 @@ ACME for subdomains is restricted for use with "dns-01" challenges. If a server 
 
 ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for Domain Namespaces subordinate to an ADN, the server indicates this by including the "domainNamespace" flag in the authorizaton object for that ADN identifier:
 
-~~~
-   domainNamespace (optional, boolean):  This field MUST be present and true
-      for authorizations where ACME server policy allows certificates
-      to be issued for any Domain Name in the Domain Namespace subordinate to
-      the ADN specified in the 'identifier' field of the authorization object.
-~~~
+    domainNamespace (optional, boolean):  This field MUST be present and true for authorizations where ACME server policy allows certificates to be issued for any Domain Name in the Domain Namespace subordinate to the ADN specified in the 'identifier' field of the authorization object.
 
 The following example shows an authorization object for the ADN `example.org` where the authorization covers the Domain Namespace subordinate to `example.org`.
 
@@ -171,9 +166,7 @@ The standard ACME workflow has authorization objects created reactively in respo
 
 ACME {{?RFC8555}} section 7.4.1 defines the "identifier" object for newAuthz requests. One additional field for the "identifier" object is defined:
 
-~~~
-domainNamespace (optional, boolean): An ACME client sets this flag to indicate to the server that it is requesting an authorizaton for the Domain Namespace subordinate to the specified ADN identifier value
-~~~
+    domainNamespace (optional, boolean): An ACME client sets this flag to indicate to the server that it is requesting an authorizaton for the Domain Namespace subordinate to the specified ADN identifier value
   
 Clients include the flag in the "identifier" object of newAuthz requests to indicate that they are requesting a Domain Namespace authorization. In the following example, the client is requesting pre-authorization for the Domain Namespace subordinate to `example.org`.
 
@@ -208,9 +201,7 @@ Clients need a mechanism to optionally indicate to servers whether or not they a
 
 This can be achieved by adding an optional field "domainNamespace" to the "identifiers" field in the order object:
 
-~~~
-domainNamespace (optional, string): This is the parent ADN of a Domain Namespace that the requested identifier belongs to. The client MUST have DNS control over over the parent ADN.
-~~~
+    domainNamespace (optional, string): This is the parent ADN of a Domain Namespace that the requested identifier belongs to. The client MUST have DNS control over over the parent ADN.
 
 This field specifies the ADN of the Domain Namespace that the client has DNS control over, and is capable of fulfilling challenges against. Based on server policy, the server can choose to issue a challenge against any parent domain of the identifier in the Domain Namespace up to and including the specified "domainNamespace", and create a corresponding authorization object against the chosen identifer.
 
@@ -246,9 +237,7 @@ Server newOrder handling generally follows the process documented ACME section 7
 
 An ACME server can advertise support for authorization of Domain Namespaces by including the following boolean flag in its "ACME Directory Metadata Fields" registry:
 
-~~~
-domainNamespace (optional, bool): Indicates if an ACME server supports authorization of Domain Namespaces.
-~~~
+    domainNamespace (optional, bool): Indicates if an ACME server supports authorization of Domain Namespaces.
 
 If not specified, then no default value is assumed. If an ACME server supports authorization of Domain Namespaces, it can indicate this by including this field with a value of "true".
 
@@ -331,7 +320,6 @@ In order to illustrate subdomain behaviour, let us assume that a client wishes t
 3. The client POSTs a newAuthz request for identifier `sub2.example.org`
 
     The server replies with a 200 (OK) response. The response body is the previously created authorization object for `example.org` with status set to "valid".
-
 
 
 # IANA Considerations

@@ -128,7 +128,7 @@ ACME for subdomains is restricted for use with "dns-01" challenges. If a server 
 
 ## Authorization Object
 
-ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for Domain Namespaces subordinate to an ADN, the server indicates this by including the "domainNamespace" flag in the authorizaton object for that ADN identifier:
+ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for Domain Namespaces subordinate to an ADN, the server indicates this by including the "domainNamespace" flag in the authorization object for that ADN identifier:
 
     domainNamespace (optional, boolean):  This field MUST be present and true for authorizations where ACME server policy allows certificates to be issued for any Domain Name in the Domain Namespace subordinate to the ADN specified in the 'identifier' field of the authorization object.
 
@@ -166,7 +166,7 @@ The standard ACME workflow has authorization objects created reactively in respo
 
 ACME {{?RFC8555}} section 7.4.1 defines the "identifier" object for newAuthz requests. One additional field for the "identifier" object is defined:
 
-    domainNamespace (optional, boolean): An ACME client sets this flag to indicate to the server that it is requesting an authorizaton for the Domain Namespace subordinate to the specified ADN identifier value
+    domainNamespace (optional, boolean): An ACME client sets this flag to indicate to the server that it is requesting an authorization for the Domain Namespace subordinate to the specified ADN identifier value
   
 Clients include the flag in the "identifier" object of newAuthz requests to indicate that they are requesting a Domain Namespace authorization. In the following example newAuthz payload, the client is requesting pre-authorization for the Domain Namespace subordinate to `example.org`.
 
@@ -188,11 +188,11 @@ Clients need a mechanism to optionally indicate to servers whether or not they a
 
 This can be achieved by adding an optional field "domainNamespace" to the "identifiers" field in the order object:
 
-    domainNamespace (optional, string): This is the parent ADN of a Domain Namespace that the requested identifier belongs to. The client MUST have DNS control over over the parent ADN.
+    domainNamespace (optional, string): This is the parent ADN of a Domain Namespace that the requested identifier belongs to. The client MUST have DNS control over the parent ADN.
 
-This field specifies the ADN of the Domain Namespace that the client has DNS control over, and is capable of fulfilling challenges against. Based on server policy, the server can choose to issue a challenge against any parent domain of the identifier in the Domain Namespace up to and including the specified "domainNamespace", and create a corresponding authorization object against the chosen identifer.
+This field specifies the ADN of the Domain Namespace that the client has DNS control over, and is capable of fulfilling challenges against. Based on server policy, the server can choose to issue a challenge against any parent domain of the identifier in the Domain Namespace up to and including the specified "domainNamespace", and create a corresponding authorization object against the chosen identifier.
 
-In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace subordinate to `bar.example.org`. The server can then choose to issue a challenge against against either `foo.bar.example.org` or `bar.example.org`.
+In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace subordinate to `bar.example.org`. The server can then choose to issue a challenge against either `foo.bar.example.org` or `bar.example.org`.
 
 ~~~
 "payload": base64url({
@@ -204,7 +204,7 @@ In the following example newOrder payload, the client requests a certificate for
      })
 ~~~
 
-In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace subordinate to `example.org`. The server can then choose to issue a challenge against against any one of `foo.bar.example.org`, `bar.example.org` or `example.org`.
+In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace subordinate to `example.org`. The server can then choose to issue a challenge against any one of `foo.bar.example.org`, `bar.example.org` or `example.org`.
 
 ~~~
 "payload": base64url({
@@ -362,7 +362,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
    }
 ~~~
 
-- STEP 2: The cient places a newOrder for `sub1.example.org`
+- STEP 2: The client places a newOrder for `sub1.example.org`
 
    The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is in the Domain Namespace that has been pre-authorised in step 1. The client does not need to include the "domainNamespace" field in the "identifier" object as it has already pre-authorized the Domain Namespace.
 
@@ -389,7 +389,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
    }   
 ~~~   
 
-As an authorization object already exists for the parent ADN of the Domain Namespace, the server replies with a order object with a status of "valid" that includes a link to the existing "valid" authorization object.
+As an authorization object already exists for the parent ADN of the Domain Namespace, the server replies with an order object with a status of "valid" that includes a link to the existing "valid" authorization object.
 
 ~~~
    HTTP/1.1 201 Created
@@ -418,7 +418,7 @@ As an authorization object already exists for the parent ADN of the Domain Names
 
 The client can proceed to finalize the order and download the certificate for  `sub1.example.org`.
 
-- STEP 3: The cient places a newOrder for `sub2.example.org`
+- STEP 3: The client places a newOrder for `sub2.example.org`
 
    The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is in the Domain Namespace that has been pre-authorised in step 1. The client does not need to include the "domainNamespace" field in the "identifier" object as it has already pre-authorized the Domain Namespace.
 
@@ -445,7 +445,7 @@ The client can proceed to finalize the order and download the certificate for  `
    }   
 ~~~   
 
-As an authorization object already exists for the parent ADN of the Domain Namespace, the server replies with a order object with a status of "valid" that includes a link to the existing "valid" authorization object.
+As an authorization object already exists for the parent ADN of the Domain Namespace, the server replies with an order object with a status of "valid" that includes a link to the existing "valid" authorization object.
 
 ~~~
    HTTP/1.1 201 Created

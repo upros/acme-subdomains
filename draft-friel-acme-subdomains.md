@@ -58,25 +58,25 @@ ACME {{?RFC8555}} defines a protocol that a certification authority (CA) and an 
    14 {{?RFC2119}} {{?RFC8174}} when, and only when, they appear in all
    capitals, as shown here.
    
-The following terms are defined in the CA/Browser Forum Baseline Requirements [CAB] and are reproduced here:
+The following terms are defined in the CA/Browser Forum Baseline Requirements [CAB] and are reproduced here
+
+- Authorization Domain Name (ADN): The Domain Name used to obtain authorization for certificate issuance for a given FQDN. The CA may use the FQDN returned from a DNS CNAME lookup as the FQDN for the purposes of domain validation. If the FQDN contains a wildcard character, then the CA MUST remove all wildcard labels from the left most portion of requested FQDN. The CA may prune zero or more labels from left to right until encountering a Base Domain Name and may use any one of the intermediate values for the purpose of domain validation
 
 - Base Domain Name: The portion of an applied-for FQDN that is the first domain name node left of a registry-controlled or public suffix plus the registry-controlled or public suffix (e.g. “example.co.uk” or “example.com”). For FQDNs where the right-most domain name node is a gTLD having ICANN Specification 13 in its registry agreement, the gTLD itself may be used as the Base Domain Name.
 
-- ADN: Authorization Domain Name. The Domain Name used to obtain authorization for certificate issuance for a given FQDN.
+- Certification Authority (CA): An organization that is responsible for the creation, issuance, revocation, and management of Certificates. The term applies equally to both Roots CAs and Subordinate CAs
 
 - Domain Name: The label assigned to a node in the Domain Name System
 
 - Domain Namespace: The set of all possible Domain Names that are subordinate to a single node in the Domain Name System
 
-The following terms are used in this document:
+- Fully‐Qualified Domain Name (FQDN): A Domain Name that includes the labels of all superior nodes in the Internet Domain Name System.
 
-- CA: Certification Authority
+The following terms are used in this document:
 
 - CSR: Certificate Signing Request
 
-- FQDN: Fully Qualified Domain Name
-
-- Parent Domain: a node in the Domain Name System that has a Domain Name
+- Parent Domain: a node in the Domain Name System that has a Domain Name and a subordinate Domain Namespace
 
 - Subdomain: a Domain Name that is in the Domain Namespace of a given Parent Domain
 
@@ -130,13 +130,13 @@ Clients need a mechanism to instruct the ACME server that they are requesting au
 
 ### Authorization Object
 
-When ACME server policy allows authorization for Domain Namespaces subordinate to an ADN, the server indicates this by including the "domainNamespace" flag in the authorizaton object for that ADN identifier:
+ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for Domain Namespaces subordinate to an ADN, the server indicates this by including the "domainNamespace" flag in the authorizaton object for that ADN identifier:
 
 ~~~
    domainNamespace (optional, boolean):  This field MUST be present and true
       for authorizations where ACME server policy allows certificates
       to be issued for any Domain Name in the Domain Namespace subordinate to
-      the ADN specified in the 'identifier' field of the authorization object
+      the ADN specified in the 'identifier' field of the authorization object.
 ~~~
 
 The following example shows an authorization object for the ADN `example.org` where the authorization covers the Domain Namespace subordinate to `example.org`.
@@ -174,7 +174,7 @@ The standard ACME workflow has authorization objects created reactively in respo
 ACME {{?RFC8555}} section 7.4.1 defines the "identifier" object for newAuthz requests. One additional field for the "identifier" object is defined:
 
 ~~~
-domainNamespace (optional, boolean): clients sets this flag to indicate to the server that it is requesting an authorizaton for the Domain Namespace subordinate to the specified ADN identifier value
+domainNamespace (optional, boolean): An ACME client sets this flag to indicate to the server that it is requesting an authorizaton for the Domain Namespace subordinate to the specified ADN identifier value
 ~~~
   
 Clients include the flag in the "identifier" object of newAuthz requests to indicate that they are requesting a Domain Namespace authorization. In the following example, the client is requesting pre-authorization for the Domain Namespace subordinate to `example.org`.
@@ -202,7 +202,7 @@ Clients include the flag in the "identifier" object of newAuthz requests to indi
    }
 ~~~
 
-If the server is willing to allow authorizations for the Domain Namespace, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "domainNamespace" flag with value of true. If the server policy does not allow creation of Domain Namespace authorizations subordinate to that ADN, the server can  create an authorization object for the indicated identifier, and include the "domainNamespace" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
+If the server is willing to allow a single authorization for the Domain Namespace, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "domainNamespace" flag with value of true. If the server policy does not allow creation of Domain Namespace authorizations subordinate to that ADN, the server can  create an authorization object for the indicated identifier, and include the "domainNamespace" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
 
 ### New Orders
 
@@ -211,7 +211,7 @@ Clients need a mechanism to optionally indicate to servers whether or not they a
 This can be achieved by adding an optional field "domainNamespace" to the "identifiers" field in the order object:
 
 ~~~
-domainNamespace (optional, string): This is the parent ADN of the Domain Namespace that the requested identifier belongs to and that client has DNS control over.
+domainNamespace (optional, string): This is the parent ADN of a Domain Namespace that the requested identifier belongs to. The client MUST have DNS control over over the parent ADN.
 ~~~
 
 This field specifies the ADN of the Domain Namespace that the client has DNS control over, and is capable of fulfilling challenges against. Based on server policy, the server can choose to issue a challenge against any parent domain of the identifier in the Domain Namespace up to and including the specified "domainNamespace", and create a corresponding authorization object against the chosen identifer.

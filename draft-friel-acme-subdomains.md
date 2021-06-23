@@ -120,15 +120,13 @@ ACME server policy could allow issuance of certificates for a subdomain to a cli
 
 ACME server policy is out of scope of this document, however some commentary is provided in {{acme-server-policy-considerations}}.
 
+Clients need a mechanism to instruct the ACME server that they are requesting authorization for a Domain Namespace subordinate to a given ADN, as opposed to just requesting authorization for an explicit ADN identifier. Clients need a mechanism to do this in both newAuthz and newOrder requests. ACME servers need a mechanism to indicate to clients that authorization objects are valid for an entire Domain Namespace. These are described in this section.
+
 ## ACME Challenge Type
 
 ACME for subdomains is restricted for use with "dns-01" challenges. If a server policy allows a client to fulfill a challenge against a parent ADN of a requested certificate FQDN identifier, then the server MUST issue a "dns-01" challenge against that parent ADN.
 
-## Domain Namespace Authorizations
-
-Clients need a mechanism to instruct the ACME server that they are requesting authorization for a Domain Namespace subordinate to a given ADN, as opposed to just requesting authorization for an explicit ADN identifier. Clients need a mechanism to do this in both newAuthz and newOrder requests. ACME servers need a mechanism to indicate to clients that authorization objects are valid for an entire Domain Namespace. These are described in this section.
-
-### Authorization Object
+## Authorization Object
 
 ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for Domain Namespaces subordinate to an ADN, the server indicates this by including the "domainNamespace" flag in the authorizaton object for that ADN identifier:
 
@@ -167,7 +165,7 @@ The following example shows an authorization object for the ADN `example.org` wh
 
 If the "domainNamespace" field is not included, then the assumed default value is false. 
 
-### Pre-Authorization
+## Pre-Authorization
 
 The standard ACME workflow has authorization objects created reactively in response to a certificate order. ACME also allows for pre-authorization, where clients obtain authorization for an identifier proactively, outside of the context of a specific issuance. With the ACME pre-authorization flow, a client can pre-authorize for a parent ADN once, and then issue multiple newOrder requests for certificates with identifiers in the Domain Namespace subordinate to that ADN.
 
@@ -204,7 +202,7 @@ Clients include the flag in the "identifier" object of newAuthz requests to indi
 
 If the server is willing to allow a single authorization for the Domain Namespace, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "domainNamespace" flag with value of true. If the server policy does not allow creation of Domain Namespace authorizations subordinate to that ADN, the server can  create an authorization object for the indicated identifier, and include the "domainNamespace" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
 
-### New Orders
+## New Orders
 
 Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against parent ADNs for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to update DNS TXT records against the parent ADNs `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent ADNs to the ACME server.
 
@@ -246,7 +244,13 @@ Server newOrder handling generally follows the process documented ACME section 7
 
 ## Directory Object Metadata
 
-An ACME server can advertise support of issuance of subdomain certificates by including the boolean flag "domainNamespace" in its "ACME Directory Metadata Fields" registry. If not specified, then no default value is assumed. If an ACME server supports issuance of subdomain certificates, it can indicate this by including this field with a value of "true".
+An ACME server can advertise support for authorization of Domain Namespaces by including the following boolean flag in its "ACME Directory Metadata Fields" registry:
+
+~~~
+domainNamespace (optional, bool): Indicates if an ACME server supports authorization of Domain Namespaces.
+~~~
+
+If not specified, then no default value is assumed. If an ACME server supports authorization of Domain Namespaces, it can indicate this by including this field with a value of "true".
 
 ## Illustrative Call Flow
 

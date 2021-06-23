@@ -168,8 +168,151 @@ ACME {{?RFC8555}} section 7.4.1 defines the "identifier" object for newAuthz req
 
     domainNamespace (optional, boolean): An ACME client sets this flag to indicate to the server that it is requesting an authorizaton for the Domain Namespace subordinate to the specified ADN identifier value
   
-Clients include the flag in the "identifier" object of newAuthz requests to indicate that they are requesting a Domain Namespace authorization. In the following example, the client is requesting pre-authorization for the Domain Namespace subordinate to `example.org`.
+Clients include the flag in the "identifier" object of newAuthz requests to indicate that they are requesting a Domain Namespace authorization. In the following example newAuthz payload, the client is requesting pre-authorization for the Domain Namespace subordinate to `example.org`.
 
+~~~
+     "payload": base64url({
+       "identifier": {
+         "type": "dns",
+         "value": "example.org",
+         "domainNamespace": true
+       }
+     })
+~~~
+
+If the server is willing to allow a single authorization for the Domain Namespace, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "domainNamespace" flag with value of true. If the server policy does not allow creation of Domain Namespace authorizations subordinate to that ADN, the server can  create an authorization object for the indicated identifier, and include the "domainNamespace" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
+
+## New Orders
+
+Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against parent ADNs for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to update DNS TXT records against the parent ADNs `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent ADNs to the ACME server.
+
+This can be achieved by adding an optional field "domainNamespace" to the "identifiers" field in the order object:
+
+    domainNamespace (optional, string): This is the parent ADN of a Domain Namespace that the requested identifier belongs to. The client MUST have DNS control over over the parent ADN.
+
+This field specifies the ADN of the Domain Namespace that the client has DNS control over, and is capable of fulfilling challenges against. Based on server policy, the server can choose to issue a challenge against any parent domain of the identifier in the Domain Namespace up to and including the specified "domainNamespace", and create a corresponding authorization object against the chosen identifer.
+
+In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace subordinate to `bar.example.org`. The server can then choose to issue a challenge against against either `foo.bar.example.org` or `bar.example.org`.
+
+~~~
+"payload": base64url({
+       "identifiers": [
+         { "type": "dns", "value": "example.org", "domainNamespace": "bar.example.org"  }
+       ],
+       "notBefore": "2016-01-01T00:04:00+04:00",
+       "notAfter": "2016-01-08T00:04:00+04:00"
+     })
+~~~
+
+In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace subordinate to `example.org`. The server can then choose to issue a challenge against against any one of `foo.bar.example.org`, `bar.example.org` or `example.org`.
+
+~~~
+"payload": base64url({
+       "identifiers": [
+         { "type": "dns", "value": "example.org", "domainNamespace": "example.org"  }
+       ],
+       "notBefore": "2016-01-01T00:04:00+04:00",
+       "notAfter": "2016-01-08T00:04:00+04:00"
+     })
+~~~
+
+If the client is unable to fulfill authorizations against parent ADNs, the client should not include the "domainNamespace" field.
+
+Server newOrder handling generally follows the process documented ACME section 7.4. If the server is willing to allow Domain Namespace authorizations for the ADN specified in "domainNamespace", then it creates an authorization object against that ADN and includes the "domainNamespace" flag with a value of true. If the server policy does not allow creation of Domain Namespace authorizations against that ADN, then it can create an authorization object for the indicated identifier value, and include the "domainNamespace" flag with value of false.
+
+## Directory Object Metadata
+
+An ACME server can advertise support for authorization of Domain Namespaces by including the following boolean flag in its "ACME Directory Metadata Fields" registry:
+
+    domainNamespace (optional, bool): Indicates if an ACME server supports authorization of Domain Namespaces.
+
+If not specified, then no default value is assumed. If an ACME server supports authorization of Domain Namespaces, it can indicate this by including this field with a value of "true".
+
+# Illustrative Call Flow
+
+The call flow illustrated here uses the ACME pre-authorization flow using DNS-based proof of ownership.
+
+~~~
+
++--------+                   +------+     +-----+
+| Client |                   | ACME |     | DNS |
++--------+                   +------+     +-----+
+    |                            |           |
+ STEP 1: Pre-Authorization of parent domain
+    |                            |           |
+    | POST /newAuthz             |           |
+    | "example.org"              |           |
+    |--------------------------->|           |
+    |                            |           |
+    | 201 authorizations         |           |
+    |<---------------------------|           |
+    |                            |           |
+    | Publish DNS TXT            |           |
+    | "example.org"              |           |
+    |--------------------------------------->|
+    |                            |           |
+    | POST /challenge            |           |
+    |--------------------------->|           |
+    |                            | Verify    |
+    |                            |---------->|
+    | 200 status=valid           |           |
+    |<---------------------------|           |
+    |                            |           |
+    | Delete DNS TXT             |           |
+    | "example.org"              |           |
+    |--------------------------------------->|
+    |                            |           |
+ STEP 2: Place order for sub1.example.org
+    |                            |           |
+    | POST /newOrder             |           |
+    | "sub1.example.org"         |           |
+    |--------------------------->|           |
+    |                            |           |
+    | 201 status=ready           |           |
+    |<---------------------------|           |
+    |                            |           |
+    | POST /finalize             |           |
+    | CSR SAN "sub1.example.org" |           |
+    |--------------------------->|           |
+    |                            |           |
+    | 200 OK status=valid        |           |
+    |<---------------------------|           |
+    |                            |           |
+    | POST /certificate          |           |
+    |--------------------------->|           |
+    |                            |           |
+    | 200 OK                     |           |
+    | PEM SAN "sub1.example.org" |           |
+    |<---------------------------|           |
+    |                            |           |
+ STEP 3: Place order for sub2.example.org
+    |                            |           |
+    | POST /newOrder             |           |
+    | "sub2.example.org"         |           |
+    |--------------------------->|           |
+    |                            |           |
+    | 201 status=ready           |           |
+    |<---------------------------|           |
+    |                            |           |
+    | POST /finalize             |           |
+    | CSR SAN "sub2.example.org" |           |
+    |--------------------------->|           |
+    |                            |           |
+    | 200 OK status=valid        |           |
+    |<---------------------------|           |
+    |                            |           |
+    | POST /certificate          |           |
+    |--------------------------->|           |
+    |                            |           |
+    | 200 OK                     |           |
+    | PEM SAN "sub2.example.org" |           |
+    |<---------------------------|           |
+~~~
+
+- STEP 1: Pre-authorization of Domain Namespace
+
+   The client sends a newAuthz request for the parent ADN of the Domain Namespace including the "domainNamespace" flag in the identifier object.
+    
 ~~~
    POST /acme/new-authz HTTP/1.1
    Host: example.com
@@ -193,134 +336,143 @@ Clients include the flag in the "identifier" object of newAuthz requests to indi
    }
 ~~~
 
-If the server is willing to allow a single authorization for the Domain Namespace, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "domainNamespace" flag with value of true. If the server policy does not allow creation of Domain Namespace authorizations subordinate to that ADN, the server can  create an authorization object for the indicated identifier, and include the "domainNamespace" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
-
-## New Orders
-
-Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against parent ADNs for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to update DNS TXT records against the parent ADNs `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent ADNs to the ACME server.
-
-This can be achieved by adding an optional field "domainNamespace" to the "identifiers" field in the order object:
-
-    domainNamespace (optional, string): This is the parent ADN of a Domain Namespace that the requested identifier belongs to. The client MUST have DNS control over over the parent ADN.
-
-This field specifies the ADN of the Domain Namespace that the client has DNS control over, and is capable of fulfilling challenges against. Based on server policy, the server can choose to issue a challenge against any parent domain of the identifier in the Domain Namespace up to and including the specified "domainNamespace", and create a corresponding authorization object against the chosen identifer.
-
-In the following example, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace subordinate to `bar.example.org`. The server can then choose to issue a challenge against against either `foo.bar.example.org` or `bar.example.org`.
-
+   The server creates and returns an authorization object for the identifier including the "domainNamespace" flag. The object is initially in "pending" state. Once the client completes the challenge, the server will transition the authorization object and associated challenge object status to "valid".
+    
 ~~~
-  {
-    "identifiers": [
-      { "type": "dns", "value": "foo.bar.example.org", "domainNamespace": "bar.example.org" }
-    ],
-    "notBefore": "2016-01-01T00:04:00+04:00",
-    "notAfter": "2016-01-08T00:04:00+04:00"
+   {
+     "status": "pending",
+     "expires": "2015-03-01T14:09:07.99Z",
+
+     "identifier": {
+       "type": "dns",
+       "value": "example.org"
+     },
+
+     "challenges": [
+       {
+         "url": "https://example.com/acme/chall/prV_B7yEyA4",
+         "type": "http-01",
+         "status": "pending",
+         "token": "DGyRejmCefe7v4NfDGDKfA",
+         "validated": "2014-12-01T12:05:58.16Z"
+       }
+     ],
+
+     "domainNamespace": true
    }
 ~~~
 
-In the following example, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace subordinate to `example.org`. The server can then choose to issue a challenge against against any one of `foo.bar.example.org`, `bar.example.org` or `example.org`.
+- STEP 2: The cient places a newOrder for `sub1.example.org`
+
+   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is in the Domain Namespace that has been pre-authorised in step 1. The client does not need to include the "domainNamespace" field in the "identifier" object as it has already pre-authorized the Domain Namespace.
 
 ~~~
-  {
-    "identifiers": [
-      { "type": "dns", "value": "foo.bar.example.org", "domainNamespace": "example.org" }
-    ],
-    "notBefore": "2016-01-01T00:04:00+04:00",
-    "notAfter": "2016-01-08T00:04:00+04:00"
+   POST /acme/new-order HTTP/1.1
+   Host: example.com
+   Content-Type: application/jose+json
+
+   {
+     "protected": base64url({
+       "alg": "ES256",
+       "kid": "https://example.com/acme/acct/evOfKhNU60wg",
+       "nonce": "5XJ1L3lEkMG7tR6pA00clA",
+       "url": "https://example.com/acme/new-order"
+     }),
+     "payload": base64url({
+       "identifiers": [
+         { "type": "dns", "value": "sub1.example.org" }
+       ],
+       "notBefore": "2016-01-01T00:04:00+04:00",
+       "notAfter": "2016-01-08T00:04:00+04:00"
+     }),
+     "signature": "H6ZXtGjTZyUnPeKn...wEA4TklBdh3e454g"
+   }   
+~~~   
+
+As an authorization object already exists for the parent ADN of the Domain Namespace, the server replies with a order object with a status of "valid" that includes a link to the existing "valid" authorization object.
+
+~~~
+   HTTP/1.1 201 Created
+   Replay-Nonce: MYAuvOpaoIiywTezizk5vw
+   Link: <https://example.com/acme/directory>;rel="index"
+   Location: https://example.com/acme/order/TOlocE8rfgo
+
+   {
+     "status": "valid",
+     "expires": "2016-01-05T14:09:07.99Z",
+
+     "notBefore": "2016-01-01T00:00:00Z",
+     "notAfter": "2016-01-08T00:00:00Z",
+
+     "identifiers": [
+       { "type": "dns", "value": "sub1.example.org" }
+     ],
+
+     "authorizations": [
+       "https://example.com/acme/authz/PAniVnsZcis"
+     ],
+
+     "finalize": "https://example.com/acme/order/TOlocE8rfgo/finalize"
    }
 ~~~
 
-If the client is unable to fulfill authorizations against parent ADNs, the client should not include the "domainNamespace" field.
+The client can proceed to finalize the order and download the certificate for  `sub1.example.org`.
 
-Server newOrder handling generally follows the process documented ACME section 7.4. If the server is willing to allow Domain Namespace authorizations for the ADN specified in "domainNamespace", then it creates an authorization object against that ADN and includes the "domainNamespace" flag with a value of true. If the server policy does not allow creation of Domain Namespace authorizations against that ADN, then it can create an authorization object for the indicated identifier value, and include the "domainNamespace" flag with value of false.
+- STEP 3: The cient places a newOrder for `sub2.example.org`
 
-## Directory Object Metadata
-
-An ACME server can advertise support for authorization of Domain Namespaces by including the following boolean flag in its "ACME Directory Metadata Fields" registry:
-
-    domainNamespace (optional, bool): Indicates if an ACME server supports authorization of Domain Namespaces.
-
-If not specified, then no default value is assumed. If an ACME server supports authorization of Domain Namespaces, it can indicate this by including this field with a value of "true".
-
-## Illustrative Call Flow
-
-The call flow illustrated here uses the ACME pre-authorization flow. The call flow also illustrates the DNS-based proof of ownership mechanism.
+   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is in the Domain Namespace that has been pre-authorised in step 1. The client does not need to include the "domainNamespace" field in the "identifier" object as it has already pre-authorized the Domain Namespace.
 
 ~~~
+   POST /acme/new-order HTTP/1.1
+   Host: example.com
+   Content-Type: application/jose+json
 
-+--------+             +------+     +-----+
-| Client |             | ACME |     | DNS |
-+--------+             +------+     +-----+
-    |                      |           |
- STEP 1: Pre-Authorization of parent domain
-    |                      |           |
-    | POST /newAuthz       |           |
-    | "example.org"        |           |
-    |--------------------->|           |
-    |                      |           |
-    | 201 authorizations   |           |
-    |<---------------------|           |
-    |                      |           |
-    | Publish DNS TXT      |           |
-    | "example.org"        |           |
-    |--------------------------------->|
-    |                      |           |
-    | POST /challenge      |           |
-    |--------------------->|           |
-    |                      | Verify    |
-    |                      |---------->|
-    | 200 status=valid     |           |
-    |<---------------------|           |
-    |                      |           |
-    | Delete DNS TXT       |           |
-    | "example.org"        |           |
-    |--------------------------------->|
-    |                      |           |
- STEP 2: Place order for subdomain
-    |                      |           |
-    | POST /newOrder       |           |
-    | "sub.example.org"    |           |
-    |--------------------->|           |
-    |                      |           |
-    | 201 status=ready     |           |
-    |<---------------------|           |
-    |                      |           |
-    | POST /finalize       |           |
-    | CSR "sub.example.org"|           |
-    |--------------------->|           |
-    |                      |           |
-    | 200 OK status=valid  |           |
-    |<---------------------|           |
-    |                      |           |
-    | POST /certificate    |           |
-    |--------------------->|           |
-    |                      |           |
-    | 200 OK               |           |
-    | PKI "sub.example.org"|           |
-    |<---------------------|           |
+   {
+     "protected": base64url({
+       "alg": "ES256",
+       "kid": "https://example.com/acme/acct/evOfKhNU60wg",
+       "nonce": "5XJ1L3lEkMG7tR6pA00clA",
+       "url": "https://example.com/acme/new-order"
+     }),
+     "payload": base64url({
+       "identifiers": [
+         { "type": "dns", "value": "sub2.example.org" }
+       ],
+       "notBefore": "2016-01-01T00:04:00+04:00",
+       "notAfter": "2016-01-08T00:04:00+04:00"
+     }),
+     "signature": "H6ZXtGjTZyUnPeKn...wEA4TklBdh3e454g"
+   }   
+~~~   
+
+As an authorization object already exists for the parent ADN of the Domain Namespace, the server replies with a order object with a status of "valid" that includes a link to the existing "valid" authorization object.
 
 ~~~
+   HTTP/1.1 201 Created
+   Replay-Nonce: MYAuvOpaoIiywTezizk5vw
+   Link: <https://example.com/acme/directory>;rel="index"
+   Location: https://example.com/acme/order/TOlocE8rfgo
 
+   {
+     "status": "valid",
+     "expires": "2016-01-05T14:09:07.99Z",
 
-## Examples
+     "notBefore": "2016-01-01T00:00:00Z",
+     "notAfter": "2016-01-08T00:00:00Z",
 
-In order to illustrate subdomain behaviour, let us assume that a client wishes to get certificates for subdomain identifiers `sub0.example.org`, `sub1.example.org` and `sub2.example.org` under parent domain `example.org`, and CA policy allows certificate issuance of these identifiers while only requiring the client to fulfill an ownership challenge for parent domain `example.org`. Let us also assume that the client has not yet proven ownership of parent domain `example.org`.
+     "identifiers": [
+       { "type": "dns", "value": "sub1.example.org" }
+     ],
 
-1. The client POSTs a newOrder request for identifier `sub0.example.org` and includes a "domainNamespace" value of `example.org`
+     "authorizations": [
+       "https://example.com/acme/authz/PAniVnsZcis"
+     ],
 
-    The server creates an authorization object for identifier `example.org`. The server replies with a 201 (Created) response. The response body is an order object with status set to "pending" and a link to newly created authorization object against the parent domain `example.org`. Therefore, the server is instructing the client to fulfill a challenge against domain identifier `example.org` in order to obtain a certificate including identifier `sub0.example.org`.
+     "finalize": "https://example.com/acme/order/ROnicE7rdde/finalize"
+   }
+~~~
 
-    The client completes the challenge for `example.org`, POSTs a CSR to the order finalize URI, and downloads the certificate.
-
-2. The client POSTs a newOrder request for identifier `sub1.example.org`
-
-    The server replies with a 201 (Created) response. The response body is an order object with status set to "ready" and a link to the unexpired authorization against the parent domain `example.org`. 
-
-    The client POSTs a CSR to the order finalize URI, and downloads the certificate.
-
-3. The client POSTs a newAuthz request for identifier `sub2.example.org`
-
-    The server replies with a 200 (OK) response. The response body is the previously created authorization object for `example.org` with status set to "valid".
-
+The client can proceed to finalize the order and download the certificate for  `sub2.example.org`.
 
 # IANA Considerations
 

@@ -197,7 +197,7 @@ In the following example newOrder payload, the client requests a certificate for
 ~~~
 "payload": base64url({
        "identifiers": [
-         { "type": "dns", "value": "example.org", "domainNamespace": "bar.example.org"  }
+         { "type": "dns", "value": "foo.bar.example.org", "domainNamespace": "bar.example.org"  }
        ],
        "notBefore": "2016-01-01T00:04:00+04:00",
        "notAfter": "2016-01-08T00:04:00+04:00"
@@ -209,7 +209,7 @@ In the following example newOrder payload, the client requests a certificate for
 ~~~
 "payload": base64url({
        "identifiers": [
-         { "type": "dns", "value": "example.org", "domainNamespace": "example.org"  }
+         { "type": "dns", "value": "foo.bar.example.org", "domainNamespace": "example.org"  }
        ],
        "notBefore": "2016-01-01T00:04:00+04:00",
        "notAfter": "2016-01-08T00:04:00+04:00"

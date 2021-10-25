@@ -58,7 +58,35 @@ ACME {{?RFC8555}} defines a protocol that a certification authority (CA) and an 
    14 {{?RFC2119}} {{?RFC8174}} when, and only when, they appear in all
    capitals, as shown here.
    
-The following terms are defined in the CA/Browser Forum Baseline Requirements [CAB] and are reproduced here
+The following terms are defined in DNS Terminoogy {{?RFC8499}} and are reproduced here:
+
+- Label: An ordered list of zero or more octets that makes up a
+      portion of a domain name.  Using graph theory, a label identifies
+      one node in a portion of the graph of all possible domain names.
+
+- Domain Name: An ordered list of one or more labels.
+
+- Subdomain: "A domain is a subdomain of another domain if it is
+      contained within that domain.  This relationship can be tested by
+      seeing if the subdomain's name ends with the containing domain's
+      name."  (Quoted from [RFC1034], Section 3.1) For example, in the
+      host name "nnn.mmm.example.com", both "mmm.example.com" and
+      "nnn.mmm.example.com" are subdomains of "example.com".  Note that
+      the comparisons here are done on whole labels; that is,
+      "ooo.example.com" is not a subdomain of "oo.example.com".
+
+- Fully-Qualified Domain Name (FQDN):  This is often just a clear way
+      of saying the same thing as "domain name of a node", as outlined
+      above.  However, the term is ambiguous.  Strictly speaking, a
+      fully-qualified domain name would include every label, including
+      the zero-length label of the root: such a name would be written
+      "www.example.net." (note the terminating dot).  But, because every
+      name eventually shares the common root, names are often written
+      relative to the root (such as "www.example.net") and are still
+      called "fully qualified".  This term first appeared in [RFC819].
+      In this document, names are often written relative to the root.
+
+The following terms are defined in the CA/Browser Forum Baseline Requirements [CAB] version 1.7.1 and are reproduced here:
 
 - Authorization Domain Name (ADN): The Domain Name used to obtain authorization for certificate issuance for a given FQDN. The CA may use the FQDN returned from a DNS CNAME lookup as the FQDN for the purposes of domain validation. If the FQDN contains a wildcard character, then the CA MUST remove all wildcard labels from the left most portion of requested FQDN. The CA may prune zero or more labels from left to right until encountering a Base Domain Name and may use any one of the intermediate values for the purpose of domain validation
 
@@ -66,19 +94,15 @@ The following terms are defined in the CA/Browser Forum Baseline Requirements [C
 
 - Certification Authority (CA): An organization that is responsible for the creation, issuance, revocation, and management of Certificates. The term applies equally to both Roots CAs and Subordinate CAs
 
-- Domain Name: The label assigned to a node in the Domain Name System
-
 - Domain Namespace: The set of all possible Domain Names that are subordinate to a single node in the Domain Name System
 
-- Fully‐Qualified Domain Name (FQDN): A Domain Name that includes the labels of all superior nodes in the Internet Domain Name System.
+The following additional terms are used in this document:
 
-The following terms are used in this document:
+- Certification Authority (CA): An organization that is responsible for the creation, issuance, revocation, and management of Certificates. The term applies equally to both Roots CAs and Subordinate CAs
 
 - CSR: Certificate Signing Request
 
-- Parent Domain: a node in the Domain Name System that has a Domain Name and a subordinate Domain Namespace
-
-- Subdomain: a Domain Name that is in the Domain Namespace of a given Parent Domain
+- Parent Domain: a domain is a parent domain of a subdomain if it contains that subdomain, as per the {{?RFC8499}} definition of subdomain. For example, for the host name "nnn.mmm.example.com", both "mmm.example.com" and "example.com" are parent domains of "nnn.mmm.example.com".
 
 # ACME Workflow and Identifier Requirements
 
@@ -100,15 +124,15 @@ A typical ACME workflow for issuance of certificates is as follows:
 
 ACME places the following restrictions on "identifiers":
 
-- section 7.1.3: The authorizations required are dictated by server policy; there may not be a 1:1 relationship between the order identifiers and the authorizations required.
+- {{?RFC8555}} section 7.1.3: The authorizations required are dictated by server policy; there may not be a 1:1 relationship between the order identifiers and the authorizations required.
 
-- section 7.1.4: the only type of "identifier" defined by the ACME specification is a fully qualified domain name: "The only type of identifier defined by this specification is a fully qualified domain name (type: "dns"). The domain name MUST be encoded in the form in which it would appear in a certificate."
+- {{?RFC8555}} section 7.1.4: the only type of "identifier" defined by the ACME specification is an FQDN: "The only type of identifier defined by this specification is a fully qualified domain name (type: "dns"). The domain name MUST be encoded in the form in which it would appear in a certificate."
 
-- Section 7.4: the "identifier" in the CSR request must match the "identifier" in the newOrder request: "The CSR MUST indicate the exact same set of requested identifiers as the initial newOrder request."
+- {{?RFC8555}} section 7.4: the "identifier" in the CSR request must match the "identifier" in the newOrder request: "The CSR MUST indicate the exact same set of requested identifiers as the initial newOrder request."
 
-- Sections 8.3: the "identifier", or FQDN, in the "authorization" object must be used when fulfilling challenges via HTTP: "Construct a URL by populating the URL template ... where the domain field is set to the domain name being verified"
+- {{?RFC8555}} section 8.3: the "identifier", or FQDN, in the "authorization" object must be used when fulfilling challenges via HTTP: "Construct a URL by populating the URL template ... where the domain field is set to the domain name being verified"
 
-- Section 8.4: the "identifier", or FQDN, in the "authorization" object must be used when fulfilling challenges via DNS: "The client constructs the validation domain name by prepending the label "_acme-challenge" to the domain name being validated."
+- {{?RFC8555}} section 8.4: the "identifier", or FQDN, in the "authorization" object must be used when fulfilling challenges via DNS: "The client constructs the validation domain name by prepending the label "_acme-challenge" to the domain name being validated."
 
 ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects.
 

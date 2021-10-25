@@ -58,7 +58,7 @@ ACME {{?RFC8555}} defines a protocol that a certification authority (CA) and an 
    14 {{?RFC2119}} {{?RFC8174}} when, and only when, they appear in all
    capitals, as shown here.
    
-The following terms are defined in DNS Terminoogy {{?RFC8499}} and are reproduced here:
+The following terms are defined in DNS Terminology {{?RFC8499}} and are reproduced here:
 
 - Label: An ordered list of zero or more octets that makes up a
       portion of a domain name.  Using graph theory, a label identifies

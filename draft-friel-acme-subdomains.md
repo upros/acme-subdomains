@@ -69,7 +69,7 @@ The following terms are defined in DNS Terminoogy {{?RFC8499}} and are reproduce
 - Subdomain: "A domain is a subdomain of another domain if it is
       contained within that domain.  This relationship can be tested by
       seeing if the subdomain's name ends with the containing domain's
-      name."  (Quoted from [RFC1034], Section 3.1) For example, in the
+      name."  (Quoted from {{?RFC1034}}, Section 3.1) For example, in the
       host name "nnn.mmm.example.com", both "mmm.example.com" and
       "nnn.mmm.example.com" are subdomains of "example.com".  Note that
       the comparisons here are done on whole labels; that is,
@@ -83,7 +83,7 @@ The following terms are defined in DNS Terminoogy {{?RFC8499}} and are reproduce
       "www.example.net." (note the terminating dot).  But, because every
       name eventually shares the common root, names are often written
       relative to the root (such as "www.example.net") and are still
-      called "fully qualified".  This term first appeared in [RFC819].
+      called "fully qualified".  This term first appeared in {{?RFC819}}.
       In this document, names are often written relative to the root.
 
 The following terms are defined in the CA/Browser Forum Baseline Requirements [CAB] version 1.7.1 and are reproduced here:

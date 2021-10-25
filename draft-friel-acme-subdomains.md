@@ -112,9 +112,9 @@ A typical ACME workflow for issuance of certificates is as follows:
 
 2. server replies with a set of "authorizations" and a "finalize" URI
 
-3. client sends POST-as-GET requests to retrieve the "authorizations", with the downloaded "authorization" object(s) containing the "identifier" that the client must prove that they control
+3. client sends POST-as-GET requests to retrieve the "authorizations", with the downloaded "authorization" object(s) containing the "identifier" that the client must prove that they control, and a set of associated "challenges", one of which the the client must fulfil
 
-4. client proves control over the "identifier" in the "authorization" object by completing the specified challenge, for example, by publishing a DNS TXT record
+4. client proves control over the "identifier" in the "authorization" object by completing one of the specified challenges, for example, by publishing a DNS TXT record
 
 5. client POSTs a CSR to the "finalize" API
 

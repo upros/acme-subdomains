@@ -83,7 +83,7 @@ The following terms are defined in DNS Terminology {{?RFC8499}} and are reproduc
       "www.example.net." (note the terminating dot).  But, because every
       name eventually shares the common root, names are often written
       relative to the root (such as "www.example.net") and are still
-      called "fully qualified".  This term first appeared in {{?RFC819}}.
+      called "fully qualified".  This term first appeared in {{?RFC0819}}.
       In this document, names are often written relative to the root.
 
 The following terms are defined in the CA/Browser Forum Baseline Requirements [CAB] version 1.7.1 and are reproduced here:

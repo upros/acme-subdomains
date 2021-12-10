@@ -2,10 +2,11 @@
 stand_alone: yes
 title: "ACME for Subdomains"
 abbrev: ACME-SUBDOMAINS
-docname: draft-friel-acme-subdomains-05
-cat: std
+docname: draft-ietf-acme-subdomains
+category: std
 coding: utf-8
 pi:
+  consensus: 'yes'
   strict: 'yes'
   toc: 'yes'
   tocdepth: '2'
@@ -15,6 +16,7 @@ pi:
   subcompact: 'no'
   comments: 'yes'
   inline: 'yes'
+
 author:
  -  ins: O. Friel
     name: Owen Friel
@@ -32,6 +34,7 @@ author:
     name: Michael Richardson
     org: Sandelman Software Works
     email: mcr+ietf@sandelman.ca
+
 informative:
   CAB:
     author:
@@ -52,12 +55,8 @@ ACME {{?RFC8555}} defines a protocol that a certification authority (CA) and an 
 
 # Terminology
 
-   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in BCP
-   14 {{?RFC2119}} {{?RFC8174}} when, and only when, they appear in all
-   capitals, as shown here.
-   
+{::boilerplate bcp14}
+ 
 The following terms are defined in DNS Terminology {{?RFC8499}} and are reproduced here:
 
 - Label: An ordered list of zero or more octets that makes up a

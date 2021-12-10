@@ -381,7 +381,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
    }
 ~~~
 
-   The server creates and returns an authorization object for the identifier including the "domainNamespace" flag. The object is initially in "pending" state. Once the client completes the challenge, the server will transition the authorization object and associated challenge object status to "valid".
+   The server creates and returns an authorization object for the identifier including the "domainNamespace" flag. The object is initially in "pending" state.
     
 ~~~
    {
@@ -406,6 +406,8 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
      "domainNamespace": true
    }
 ~~~
+
+   Once the client completes the challenge, the server will transition the authorization object and associated challenge object status to "valid".
 
 - STEP 2: The client places a newOrder for `sub1.example.org`
 
@@ -434,7 +436,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
    }   
 ~~~   
 
-As an authorization object already exists for the parent ADN of the Domain Namespace, the server replies with an order object with a status of "valid" that includes a link to the existing "valid" authorization object.
+As an authorization object already exists for the parent ADN of the Domain Namespace, the server replies with an order object with a status of "ready" that includes a link to the existing "valid" authorization object.
 
 ~~~
    HTTP/1.1 201 Created
@@ -443,7 +445,7 @@ As an authorization object already exists for the parent ADN of the Domain Names
    Location: https://example.com/acme/order/TOlocE8rfgo
 
    {
-     "status": "valid",
+     "status": "ready",
      "expires": "2016-01-05T14:09:07.99Z",
 
      "notBefore": "2016-01-01T00:00:00Z",
@@ -461,7 +463,7 @@ As an authorization object already exists for the parent ADN of the Domain Names
    }
 ~~~
 
-The client can proceed to finalize the order and download the certificate for  `sub1.example.org`.
+The client can proceed to finalize the order and download the certificate for `sub1.example.org`.
 
 - STEP 3: The client places a newOrder for `sub2.example.org`
 
@@ -490,7 +492,7 @@ The client can proceed to finalize the order and download the certificate for  `
    }   
 ~~~   
 
-As an authorization object already exists for the parent ADN of the Domain Namespace, the server replies with an order object with a status of "valid" that includes a link to the existing "valid" authorization object.
+As an authorization object already exists for the parent ADN of the Domain Namespace, the server replies with an order object with a status of "ready" that includes a link to the existing "valid" authorization object.
 
 ~~~
    HTTP/1.1 201 Created
@@ -499,7 +501,7 @@ As an authorization object already exists for the parent ADN of the Domain Names
    Location: https://example.com/acme/order/TOlocE8rfgo
 
    {
-     "status": "valid",
+     "status": "ready",
      "expires": "2016-01-05T14:09:07.99Z",
 
      "notBefore": "2016-01-01T00:00:00Z",
@@ -517,7 +519,7 @@ As an authorization object already exists for the parent ADN of the Domain Names
    }
 ~~~
 
-The client can proceed to finalize the order and download the certificate for  `sub2.example.org`.
+The client can proceed to finalize the order and download the certificate for `sub2.example.org`.
 
 # IANA Considerations
 

@@ -137,18 +137,18 @@ Clients need a mechanism to instruct the ACME server that they are requesting au
 
 ## ACME Challenge Type
 
-ACME for subdomains is restricted for use with "dns-01" challenges. If a server policy allows a client to fulfill a challenge against a parent ADN of a requested certificate FQDN identifier, then the server MUST issue a "dns-01" challenge against that parent ADN.
+ACME for subdomains is restricted for use with "dns-01" challenges. If a server policy allows a client to fulfill a challenge against a parent domain of a requested certificate FQDN identifier, then the server MUST issue a "dns-01" challenge against that parent domain.
 
 ## Authorization Object
 
 ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for subdomains subordinate to an domain, the server indicates this by including the "subdomains" flag in the authorization object for that domain identifier:
 
 ~~~
-domainNamespace (optional, boolean):  This field MUST be present
+subdomains (optional, boolean):  This field MUST be present
    and true for authorizations where ACME server policy allows 
-   certificates to be issued for any Domain Name in the Domain
-   Namespace subordinate to the ADN specified in the 'identifier'
-   field of the authorization object.
+   certificates to be issued for any subdomain subordinate to
+   the domain specified in the 'identifier' field of the
+   authorization object.
 ~~~
 
 The following example shows an authorization object for the domain `example.org` where the authorization covers the subdomains subordinate to `example.org`.
@@ -215,7 +215,7 @@ This can be achieved by adding an optional field "parentDomain" to the "identifi
 ~~~
 parentDomain (optional, string): This is a parent domain of 
    the requested identifier. The client MUST have DNS 
-   control over the parent ADN.
+   control over the parent domain.
 ~~~
 
 This field specifies a parent domain of the identifier that the client has DNS control over, and is capable of fulfilling challenges against. Based on server policy, the server can choose to issue a challenge against any parent domain of the identifier up to and including the specified "parentDomain", and create a corresponding authorization object against the chosen identifier.
@@ -248,7 +248,7 @@ In the following example newOrder payload, the client requests a certificate for
      })
 ~~~
 
-If the client is unable to fulfill authorizations against parent domain, the client should not include the "domainNamespace" field.
+If the client is unable to fulfill authorizations against parent domain, the client should not include the "parentDomain" field.
 
 Server newOrder handling generally follows the process documented ACME section 7.4. If the server is willing to allow subdomain authorizations for the domain specified in "parentDomain", then it creates an authorization object against that parent domain and includes the "subdomains" flag with a value of true. If the server policy does not allow creation of subdomain authorizations against that parent domain, then it can create an authorization object for the indicated identifier value, and includes the "subdomains" flag with value of false.
 
@@ -344,7 +344,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
     |<---------------------------|           |
 ~~~
 
-- STEP 1: Pre-authorization of Domain Namespace
+- STEP 1: Pre-authorization of parent domain
 
    The client sends a newAuthz request for the parent domain including the "subdomains" flag in the identifier object.
     
@@ -393,7 +393,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
        }
      ],
 
-     "domainNamespace": true
+     "subdomains": true
    }
 ~~~
 

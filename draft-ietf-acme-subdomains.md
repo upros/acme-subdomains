@@ -44,7 +44,7 @@ informative:
 
 --- abstract
 
-This document outlines how ACME can be used by a client to obtain a certificate for a subdomain identifier from a certification authority. The client has fulfilled a challenge against a parent domain but does not need to fulfill a challenge against the explicit subdomain as certificate policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
+This document outlines how ACME can be used by a client to obtain a certificate for a subdomain identifier from a certification authority. The client has fulfilled a challenge against a parent domain but does not need to fulfill a challenge against the explicit subdomain as certification authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
 
 --- middle
 
@@ -84,16 +84,6 @@ The following terms are defined in DNS Terminology {{?RFC8499}} and are reproduc
       relative to the root (such as "www.example.net") and are still
       called "fully qualified".  This term first appeared in {{?RFC0819}}.
       In this document, names are often written relative to the root.
-
-The following terms are defined in the CA/Browser Forum Baseline Requirements [CAB] version 1.7.1 and are reproduced here:
-
-- Authorization Domain Name (ADN): The Domain Name used to obtain authorization for certificate issuance for a given FQDN. The CA may use the FQDN returned from a DNS CNAME lookup as the FQDN for the purposes of domain validation. If the FQDN contains a wildcard character, then the CA MUST remove all wildcard labels from the left most portion of requested FQDN. The CA may prune zero or more labels from left to right until encountering a Base Domain Name and may use any one of the intermediate values for the purpose of domain validation
-
-- Base Domain Name: The portion of an applied-for FQDN that is the first domain name node left of a registry-controlled or public suffix plus the registry-controlled or public suffix (e.g. “example.co.uk” or “example.com”). For FQDNs where the right-most domain name node is a gTLD having ICANN Specification 13 in its registry agreement, the gTLD itself may be used as the Base Domain Name.
-
-- Certification Authority (CA): An organization that is responsible for the creation, issuance, revocation, and management of Certificates. The term applies equally to both Roots CAs and Subordinate CAs
-
-- Domain Namespace: The set of all possible Domain Names that are subordinate to a single node in the Domain Name System
 
 The following additional terms are used in this document:
 
@@ -143,7 +133,7 @@ ACME server policy could allow issuance of certificates for a subdomain to a cli
 
 ACME server policy is out of scope of this document, however some commentary is provided in {{acme-server-policy-considerations}}.
 
-Clients need a mechanism to instruct the ACME server that they are requesting authorization for a Domain Namespace subordinate to a given ADN, as opposed to just requesting authorization for an explicit ADN identifier. Clients need a mechanism to do this in both newAuthz and newOrder requests. ACME servers need a mechanism to indicate to clients that authorization objects are valid for an entire Domain Namespace. These are described in this section.
+Clients need a mechanism to instruct the ACME server that they are requesting authorization for all subdomains subordinate to the specified domain, as opposed to just requesting authorization for an explicit domain identifier. Clients need a mechanism to do this in both newAuthz and newOrder requests. ACME servers need a mechanism to indicate to clients that authorization objects are valid for all subdomains under the specified domain. These are described in this section.
 
 ## ACME Challenge Type
 
@@ -151,7 +141,7 @@ ACME for subdomains is restricted for use with "dns-01" challenges. If a server 
 
 ## Authorization Object
 
-ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for Domain Namespaces subordinate to an ADN, the server indicates this by including the "domainNamespace" flag in the authorization object for that ADN identifier:
+ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for subdomains subordinate to an domain, the server indicates this by including the "subdomains" flag in the authorization object for that domain identifier:
 
 ~~~
 domainNamespace (optional, boolean):  This field MUST be present
@@ -161,7 +151,7 @@ domainNamespace (optional, boolean):  This field MUST be present
    field of the authorization object.
 ~~~
 
-The following example shows an authorization object for the ADN `example.org` where the authorization covers the Domain Namespace subordinate to `example.org`.
+The following example shows an authorization object for the domain `example.org` where the authorization covers the subdomains subordinate to `example.org`.
 
 ~~~
    {
@@ -183,82 +173,82 @@ The following example shows an authorization object for the ADN `example.org` wh
        }
      ],
 
-     "domainNamespace": true
+     "subdomains": true
    }
 ~~~
 
-If the "domainNamespace" field is not included, then the assumed default value is false. 
+If the "subdomains" field is not included, then the assumed default value is false. 
 
 ## Pre-Authorization
 
-The standard ACME workflow has authorization objects created reactively in response to a certificate order. ACME also allows for pre-authorization, where clients obtain authorization for an identifier proactively, outside of the context of a specific issuance. With the ACME pre-authorization flow, a client can pre-authorize for a parent ADN once, and then issue multiple newOrder requests for certificates with identifiers in the Domain Namespace subordinate to that ADN.
+The standard ACME workflow has authorization objects created reactively in response to a certificate order. ACME also allows for pre-authorization, where clients obtain authorization for an identifier proactively, outside of the context of a specific issuance. With the ACME pre-authorization flow, a client can pre-authorize for a domain once, and then issue multiple newOrder requests for certificates with identifiers in the subdomains subordinate to that domain.
 
 ACME {{?RFC8555}} section 7.4.1 defines the "identifier" object for newAuthz requests. One additional field for the "identifier" object is defined:
 
 ~~~
-domainNamespace (optional, boolean): An ACME client sets this flag
+subdomains (optional, boolean): An ACME client sets this flag
    to indicate to the server that it is requesting an authorization
-   for the Domain Namespace subordinate to the specified ADN
+   for the subdomains subordinate to the specified domain
    identifier value
 ~~~
   
-Clients include the flag in the "identifier" object of newAuthz requests to indicate that they are requesting a Domain Namespace authorization. In the following example newAuthz payload, the client is requesting pre-authorization for the Domain Namespace subordinate to `example.org`.
+Clients include the flag in the "identifier" object of newAuthz requests to indicate that they are requesting a subdomain authorization. In the following example newAuthz payload, the client is requesting pre-authorization for the subdomains subordinate to `example.org`.
 
 ~~~
      "payload": base64url({
        "identifier": {
          "type": "dns",
          "value": "example.org",
-         "domainNamespace": true
+         "subdomains": true
        }
      })
 ~~~
 
-If the server is willing to allow a single authorization for the Domain Namespace, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "domainNamespace" flag with value of true. If the server policy does not allow creation of Domain Namespace authorizations subordinate to that ADN, the server can  create an authorization object for the indicated identifier, and include the "domainNamespace" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
+If the server is willing to allow a single authorization for the subdomains, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "subdomains" flag with value of true. If the server policy does not allow creation of subdomain authorizations subordinate to that domain, the server can  create an authorization object for the indicated identifier, and include the "subdomains" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
 
 ## New Orders
 
-Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against parent ADNs for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to update DNS TXT records against the parent ADNs `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent ADNs to the ACME server.
+Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against parent domains for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to update DNS TXT records against the parent domains `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent domains to the ACME server.
 
-This can be achieved by adding an optional field "domainNamespace" to the "identifiers" field in the order object:
-
-~~~
-domainNamespace (optional, string): This is the parent ADN of a
-   Domain Namespace that the requested identifier belongs to. The
-   client MUST have DNS control over the parent ADN.
-~~~
-
-This field specifies the ADN of the Domain Namespace that the client has DNS control over, and is capable of fulfilling challenges against. Based on server policy, the server can choose to issue a challenge against any parent domain of the identifier in the Domain Namespace up to and including the specified "domainNamespace", and create a corresponding authorization object against the chosen identifier.
-
-In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace subordinate to `bar.example.org`. The server can then choose to issue a challenge against either `foo.bar.example.org` or `bar.example.org` identifiers.
+This can be achieved by adding an optional field "parentDomain" to the "identifiers" field in the order object:
 
 ~~~
-"payload": base64url({
-       "identifiers": [
-         { "type": "dns",
-           "value": "foo.bar.example.org",
-           "domainNamespace": "bar.example.org"  }
-       ],
-       "notBefore": "2016-01-01T00:04:00+04:00",
-       "notAfter": "2016-01-08T00:04:00+04:00"
-     })
+parentDomain (optional, string): This is a parent domain of 
+   the requested identifier. The client MUST have DNS 
+   control over the parent ADN.
 ~~~
 
-In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent ADN and the Domain Namespace subordinate to `example.org`. The server can then choose to issue a challenge against any one of `foo.bar.example.org`, `bar.example.org` or `example.org` identifiers.
+This field specifies a parent domain of the identifier that the client has DNS control over, and is capable of fulfilling challenges against. Based on server policy, the server can choose to issue a challenge against any parent domain of the identifier up to and including the specified "parentDomain", and create a corresponding authorization object against the chosen identifier.
+
+In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent domain `bar.example.org`. The server can then choose to issue a challenge against either `foo.bar.example.org` or `bar.example.org` identifiers.
 
 ~~~
 "payload": base64url({
        "identifiers": [
          { "type": "dns",
            "value": "foo.bar.example.org",
-           "domainNamespace": "example.org"  }
+           "parentDomain": "bar.example.org"  }
        ],
        "notBefore": "2016-01-01T00:04:00+04:00",
        "notAfter": "2016-01-08T00:04:00+04:00"
      })
 ~~~
 
-If the client is unable to fulfill authorizations against parent ADNs, the client should not include the "domainNamespace" field.
+In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent domain `example.org`. The server can then choose to issue a challenge against any one of `foo.bar.example.org`, `bar.example.org` or `example.org` identifiers.
+
+~~~
+"payload": base64url({
+       "identifiers": [
+         { "type": "dns",
+           "value": "foo.bar.example.org",
+           "parentDomain": "example.org"  }
+       ],
+       "notBefore": "2016-01-01T00:04:00+04:00",
+       "notAfter": "2016-01-08T00:04:00+04:00"
+     })
+~~~
+
+If the client is unable to fulfill authorizations against parent domain, the client should not include the "domainNamespace" field.
 
 Server newOrder handling generally follows the process documented ACME section 7.4. If the server is willing to allow Domain Namespace authorizations for the ADN specified in "domainNamespace", then it creates an authorization object against that ADN and includes the "domainNamespace" flag with a value of true. If the server policy does not allow creation of Domain Namespace authorizations against that ADN, then it can create an authorization object for the indicated identifier value, and include the "domainNamespace" flag with value of false.
 

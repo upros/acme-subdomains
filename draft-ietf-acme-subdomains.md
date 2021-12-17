@@ -250,18 +250,18 @@ In the following example newOrder payload, the client requests a certificate for
 
 If the client is unable to fulfill authorizations against parent domain, the client should not include the "domainNamespace" field.
 
-Server newOrder handling generally follows the process documented ACME section 7.4. If the server is willing to allow Domain Namespace authorizations for the ADN specified in "domainNamespace", then it creates an authorization object against that ADN and includes the "domainNamespace" flag with a value of true. If the server policy does not allow creation of Domain Namespace authorizations against that ADN, then it can create an authorization object for the indicated identifier value, and include the "domainNamespace" flag with value of false.
+Server newOrder handling generally follows the process documented ACME section 7.4. If the server is willing to allow subdomain authorizations for the domain specified in "parentDomain", then it creates an authorization object against that parent domain and includes the "subdomains" flag with a value of true. If the server policy does not allow creation of subdomain authorizations against that parent domain, then it can create an authorization object for the indicated identifier value, and includes the "subdomains" flag with value of false.
 
 ## Directory Object Metadata
 
-An ACME server can advertise support for authorization of Domain Namespaces by including the following boolean flag in its "ACME Directory Metadata Fields" registry:
+An ACME server can advertise support for authorization of subdomains by including the following boolean flag in its "ACME Directory Metadata Fields" registry:
 
 ~~~
-domainNamespace (optional, bool): Indicates if an ACME server
-   supports authorization of Domain Namespaces.
+subdomains (optional, bool): Indicates if an ACME server
+   supports authorization of subdomains.
 ~~~
 
-If not specified, then no default value is assumed. If an ACME server supports authorization of Domain Namespaces, it can indicate this by including this field with a value of "true".
+If not specified, then no default value is assumed. If an ACME server supports authorization of subdomains, it can indicate this by including this field with a value of "true".
 
 # Illustrative Call Flow
 
@@ -346,7 +346,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
 
 - STEP 1: Pre-authorization of Domain Namespace
 
-   The client sends a newAuthz request for the parent ADN of the Domain Namespace including the "domainNamespace" flag in the identifier object.
+   The client sends a newAuthz request for the parent domain including the "subdomains" flag in the identifier object.
     
 ~~~
    POST /acme/new-authz HTTP/1.1
@@ -364,14 +364,14 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
        "identifier": {
          "type": "dns",
          "value": "example.org",
-         "domainNamespace": true
+         "subdomains": true
        }
      }),
      "signature": "nuSDISbWG8mMgE7H...QyVUL68yzf3Zawps"
    }
 ~~~
 
-   The server creates and returns an authorization object for the identifier including the "domainNamespace" flag. The object is initially in "pending" state.
+   The server creates and returns an authorization object for the identifier including the "subdomains" flag. The object is initially in "pending" state.
     
 ~~~
    {
@@ -401,7 +401,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
 
 - STEP 2: The client places a newOrder for `sub1.example.org`
 
-   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is in the Domain Namespace that has been pre-authorised in step 1. The client does not need to include the "domainNamespace" field in the "identifier" object as it has already pre-authorized the Domain Namespace.
+   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the parent domain that has been pre-authorised in step 1. The client does not need to include the "subdomains" field in the "identifier" object as it has already pre-authorized the parent domain.
 
 ~~~
    POST /acme/new-order HTTP/1.1
@@ -426,7 +426,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
    }   
 ~~~   
 
-As an authorization object already exists for the parent ADN of the Domain Namespace, the server replies with an order object with a status of "ready" that includes a link to the existing "valid" authorization object.
+As an authorization object already exists for the parent domain, the server replies with an order object with a status of "ready" that includes a link to the existing "valid" authorization object.
 
 ~~~
    HTTP/1.1 201 Created
@@ -457,7 +457,7 @@ The client can proceed to finalize the order and download the certificate for `s
 
 - STEP 3: The client places a newOrder for `sub2.example.org`
 
-   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is in the Domain Namespace that has been pre-authorised in step 1. The client does not need to include the "domainNamespace" field in the "identifier" object as it has already pre-authorized the Domain Namespace.
+   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the parent domain that has been pre-authorised in step 1. The client does not need to include the "subdomains" field in the "identifier" object as it has already pre-authorized the parent domain.
 
 ~~~
    POST /acme/new-order HTTP/1.1
@@ -482,7 +482,7 @@ The client can proceed to finalize the order and download the certificate for `s
    }   
 ~~~   
 
-As an authorization object already exists for the parent ADN of the Domain Namespace, the server replies with an order object with a status of "ready" that includes a link to the existing "valid" authorization object.
+As an authorization object already exists for the parent domain, the server replies with an order object with a status of "ready" that includes a link to the existing "valid" authorization object.
 
 ~~~
    HTTP/1.1 201 Created
@@ -517,21 +517,21 @@ The client can proceed to finalize the order and download the certificate for `s
 
 The following field is added to the "ACME Authorization Object Fields" registry defined in ACME {{?RFC8555}}.
 
-        +-----------------+------------+--------------+-----------+
-        | Field Name      | Field Type | Configurable | Reference |
-        +-----------------+------------+--------------+-----------+
-        | domainNamespace | boolean    | false        | RFC XXXX  |
-        +-----------------+------------+--------------+-----------+
+        +------------+------------+--------------+-----------+
+        | Field Name | Field Type | Configurable | Reference |
+        +------------+------------+--------------+-----------+
+        | subdomains | boolean    | false        | RFC XXXX  |
+        +------------+------------+--------------+-----------+
 
 ## Directory Object Metadata Fields Registry
 
 The following field is added to the "ACME Directory Metadata Fields" registry defined in ACME {{?RFC8555}}.
 
-         +-----------------+------------+-----------+
-         | Field Name      | Field Type | Reference |
-         +-----------------+------------+-----------+
-         | domainNamespace | boolean    | RFC XXXX  |
-         +-----------------+------------+-----------+
+         +------------+------------+-----------+
+         | Field Name | Field Type | Reference |
+         +------------+------------+-----------+
+         | subdomains | boolean    | RFC XXXX  |
+         +------------+------------+-----------+
 
 # Security Considerations 
 
@@ -581,16 +581,4 @@ ACME server policy could specify whether:
 
 - whether DNS based proof of ownership, or HTTP based proof of ownership, or both, are allowed
 
-ACME server policy specification is explicitly out of scope of this document. For reference, extracts from CA/Browser Forum Baseline Requirements are given in the appendices.
-
---- back
-
-# CA Browser Forum Baseline Requirements Extracts
-
-The CA/Browser Forum Baseline Requirements [CAB] allow issuance of subdomain certificates where authorization is only required for a parent domain. Baseline Requirements version 1.7.1 states:
-
-- Section: "1.6.1 Definitions": Authorization Domain Name: The Domain Name used to obtain authorization for certificate issuance for a given FQDN. The CA may use the FQDN returned from a DNS CNAME lookup as the FQDN for the purposes of domain validation. If the FQDN contains a wildcard character, then the CA MUST remove all wildcard labels from the left most portion of requested FQDN. The CA may prune zero or more labels from left to right until encountering a Base Domain Name and may use any one of the intermediate values for the purpose of domain validation.
-
-- Section: "3.2.2.4.6 Agreed-Upon Change to Website": Once the FQDN has been validated using this method, the CA MAY also issue Certificates for other FQDNs that end with all the labels of the validated FQDN. This method is suitable for validating Wildcard Domain Names.
-
-- Section: "3.2.2.4.7 DNS Change": Once the FQDN has been validated using this method, the CA MAY also issue Certificates for other FQDNs that end with all the labels of the validated FQDN. This method is suitable for validating Wildcard Domain Names.
+ACME server policy specification is explicitly out of scope of this document.

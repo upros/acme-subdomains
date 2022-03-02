@@ -60,7 +60,7 @@ ACME {{?RFC8555}} defines a protocol that a certification authority (CA) and an 
 # Terminology
 
 {::boilerplate bcp14}
- 
+
 The following terms are defined in DNS Terminology {{?RFC8499}} and are reproduced here:
 
 - Label: An ordered list of zero or more octets that makes up a
@@ -149,7 +149,7 @@ ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME serv
 
 ~~~
 subdomains (optional, boolean):  This field MUST be present
-   and true for authorizations where ACME server policy allows 
+   and true for authorizations where ACME server policy allows
    certificates to be issued for any subdomain subordinate to
    the domain specified in the 'identifier' field of the
    authorization object.
@@ -181,7 +181,7 @@ The following example shows an authorization object for the domain `example.org`
    }
 ~~~
 
-If the "subdomains" field is not included, then the assumed default value is false. 
+If the "subdomains" field is not included, then the assumed default value is false.
 
 ## Pre-Authorization
 
@@ -195,7 +195,7 @@ subdomains (optional, boolean): An ACME client sets this flag
    for the subdomains subordinate to the specified domain
    identifier value
 ~~~
-  
+
 Clients include the flag in the "identifier" object of newAuthz requests to indicate that they are requesting a subdomain authorization. In the following example newAuthz payload, the client is requesting pre-authorization for the subdomains subordinate to `example.org`.
 
 ~~~
@@ -217,8 +217,8 @@ Clients need a mechanism to optionally indicate to servers whether or not they a
 This can be achieved by adding an optional field "parentDomain" to the "identifiers" field in the order object:
 
 ~~~
-parentDomain (optional, string): This is a parent domain of 
-   the requested identifier. The client MUST have DNS 
+parentDomain (optional, string): This is a parent domain of
+   the requested identifier. The client MUST have DNS
    control over the parent domain.
 ~~~
 
@@ -351,7 +351,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
 - STEP 1: Pre-authorization of parent domain
 
    The client sends a newAuthz request for the parent domain including the "subdomains" flag in the identifier object.
-    
+
 ~~~
    POST /acme/new-authz HTTP/1.1
    Host: example.com
@@ -376,7 +376,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
 ~~~
 
    The server creates and returns an authorization object for the identifier including the "subdomains" flag. The object is initially in "pending" state.
-    
+
 ~~~
    {
      "status": "pending",
@@ -427,8 +427,8 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
        "notAfter": "2016-01-08T00:04:00+04:00"
      }),
      "signature": "H6ZXtGjTZyUnPeKn...wEA4TklBdh3e454g"
-   }   
-~~~   
+   }
+~~~
 
 As an authorization object already exists for the parent domain, the server replies with an order object with a status of "ready" that includes a link to the existing "valid" authorization object.
 
@@ -483,8 +483,8 @@ The client can proceed to finalize the order and download the certificate for `s
        "notAfter": "2016-01-08T00:04:00+04:00"
      }),
      "signature": "H6ZXtGjTZyUnPeKn...wEA4TklBdh3e454g"
-   }   
-~~~   
+   }
+~~~
 
 As an authorization object already exists for the parent domain, the server replies with an order object with a status of "ready" that includes a link to the existing "valid" authorization object.
 
@@ -517,7 +517,7 @@ The client can proceed to finalize the order and download the certificate for `s
 
 # IANA Considerations
 
-## Authorization Object Fields Registry 
+## Authorization Object Fields Registry
 
 The following field is added to the "ACME Authorization Object Fields" registry defined in ACME {{?RFC8555}}.
 
@@ -537,7 +537,7 @@ The following field is added to the "ACME Directory Metadata Fields" registry de
          | subdomains | boolean    | RFC XXXX  |
          +------------+------------+-----------+
 
-# Security Considerations 
+# Security Considerations
 
 This document documents enhancements to ACME {{?RFC8555}} that optimize the protocol flows for issuance of certificates for subdomains. The underlying goal of ACME for Subdomains remains the same as that of ACME: managing certificates that attest to identifier/key bindings for these subdomains. Thus, ACME for Subdomains has the same two security goals as ACME:
 
@@ -563,7 +563,7 @@ Therefore, all Security Considerations in ACME in the following areas are equall
 
 - Server-Side Request Forgery
 
-- CA Policy Considerations 
+- CA Policy Considerations
 
 Some additional comments on ACME server policy are given in the following section.
 
@@ -571,7 +571,7 @@ Some additional comments on ACME server policy are given in the following sectio
 
 The ACME for Subdomains and the ACME specifications do not mandate any specific ACME server or CA policies, or any specific use cases for issuance of certificates. For example, an ACME server could be used:
 
-- to issue Web PKI certificates where the ACME server must comply with CA/Browser Forum [CAB] Baseline Requirements. 
+- to issue Web PKI certificates where the ACME server must comply with CA/Browser Forum [CAB] Baseline Requirements.
 
 - as a Private CA for issuance of certificates within an organisation. The organisation could enforce whatever policies they desire on the ACME server.
 

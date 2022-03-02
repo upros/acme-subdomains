@@ -1,12 +1,16 @@
 ---
 stand_alone: yes
 title: "ACME for Subdomains"
+ipr: trust200902
 abbrev: ACME-SUBDOMAINS
-docname: draft-ietf-acme-subdomains
-category: std
+area: Security
+wg: ACME Working Group
+cat: std
+consensus: 'yes'
+docname: draft-ietf-acme-subdomains-latest
 coding: utf-8
 pi:
-  consensus: 'yes'
+  rfcedstyle: 'yes'
   strict: 'yes'
   toc: 'yes'
   tocdepth: '2'

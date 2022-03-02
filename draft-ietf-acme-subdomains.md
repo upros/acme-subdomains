@@ -502,7 +502,7 @@ As an authorization object already exists for the parent domain, the server repl
      "notAfter": "2016-01-08T00:00:00Z",
 
      "identifiers": [
-       { "type": "dns", "value": "sub1.example.org" }
+       { "type": "dns", "value": "sub2.example.org" }
      ],
 
      "authorizations": [

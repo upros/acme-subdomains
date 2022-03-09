@@ -402,7 +402,9 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
    }
 ~~~
 
-   Once the client completes the challenge, the server will transition the authorization object and associated challenge object status to "valid". The flow above illustrates the ACME server replying to the client's challenge with status of "valid" after the ACME server has validated the DNS challenge. However, the validation flow may take some time, so the client may need to poll the authorization resource to see when it is finalized.
+   Once the client completes the challenge, the server will transition the authorization object and associated challenge object status to "valid". The call flow above illustrates the ACME server replying to the client's challenge with status of "valid" after the ACME server has validated the DNS challenge.
+   
+   However, the validation flow may take some time. If this is the case, the ACME server may reply to the client's challenge immediately with a status of "processing", and the client will then need to poll the authorization resource to see when it is finalized. Refer to ACME {{?RFC8555}} section 7.5.1 for more details.
 
 - STEP 2: The client places a newOrder for `sub1.example.org`
 

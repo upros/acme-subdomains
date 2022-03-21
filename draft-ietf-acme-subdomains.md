@@ -94,9 +94,9 @@ The following additional terms are used in this document:
 
 - Certification Authority (CA): An organization that is responsible for the creation, issuance, revocation, and management of Certificates. The term applies equally to both Root CAs and Subordinate CAs
 
-- CSR: Certificate Signing Request
+- CSR: Certificate Signing Request as defined in {{?RFC2986}}
 
-- Parent Domain: a domain is a parent domain of a subdomain if it contains that subdomain, as per the {{?RFC8499}} definition of subdomain. For example, for the host name "nnn.mmm.example.com", both "mmm.example.com" and "example.com" are parent domains of "nnn.mmm.example.com".
+- Parent Domain: a domain is a parent domain of a subdomain if it contains that subdomain, as per the {{?RFC8499}} definition of subdomain. For example, for the host name "nnn.mmm.example.com", both "mmm.example.com" and "example.com" are parent domains of "nnn.mmm.example.com". Note that the comparisons here are done on whole labels; that is, "oo.example.com" is not a parent domain of "ooo.example.com"
 
 # ACME Workflow and Identifier Requirements
 

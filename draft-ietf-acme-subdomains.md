@@ -106,7 +106,7 @@ A typical ACME workflow for issuance of certificates is as follows:
 
 2. server replies with a set of "authorizations" and a "finalize" URI
 
-3. client sends POST-as-GET requests to retrieve the "authorizations", with the downloaded "authorization" object(s) containing the "identifier" that the client must prove that they control, and a set of associated "challenges", one of which the the client must fulfil
+3. client sends POST-as-GET requests to retrieve the "authorizations", with the downloaded "authorization" object(s) containing the "identifier" that the client must prove that they control, and a set of associated "challenges", one of which the client must fulfil
 
 4. client proves control over the "identifier" in the "authorization" object by completing one of the specified challenges, for example, by publishing a DNS TXT record
 
@@ -136,13 +136,13 @@ As noted in the previous section, ACME does not mandate that the "identifier" in
 
 ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for a parent domain of that subdomain. This allows a flow where a client proves ownership of, for example, "example.org" and then successfully obtains a certificate for "sub.example.org".
 
-ACME server policy is out of scope of this document, however some commentary is provided in {{acme-server-policy-considerations}}.
+ACME server policy is out of scope of this document, however, some commentary is provided in {{acme-server-policy-considerations}}.
 
 Clients need a mechanism to instruct the ACME server that they are requesting authorization for all subdomains subordinate to the specified domain, as opposed to just requesting authorization for an explicit domain identifier. Clients need a mechanism to do this in both newAuthz and newOrder requests. ACME servers need a mechanism to indicate to clients that authorization objects are valid for all subdomains under the specified domain. These are described in this section.
 
 ## Authorization Object
 
-ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for subdomains subordinate to an domain, the server indicates this by including the "subdomains" flag in the authorization object for that domain identifier:
+ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for subdomains subordinate to a domain, the server indicates this by including the "subdomains" flag in the authorization object for that domain identifier:
 
 ~~~
 subdomains (optional, boolean):  This field MUST be present
@@ -205,7 +205,7 @@ Clients include the flag in the "identifier" object of newAuthz requests to indi
      })
 ~~~
 
-If the server is willing to allow a single authorization for the subdomains, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "subdomains" flag with value of true. If the server policy does not allow creation of subdomain authorizations subordinate to that domain, the server can  create an authorization object for the indicated identifier, and include the "subdomains" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
+If the server is willing to allow a single authorization for the subdomains, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "subdomains" flag with value of true. If the server policy does not allow creation of subdomain authorizations subordinate to that domain, the server can create an authorization object for the indicated identifier, and include the "subdomains" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
 
 ## New Orders
 
@@ -572,7 +572,7 @@ The ACME for Subdomains and the ACME specifications do not mandate any specific 
 
 - to issue Web PKI certificates where the ACME server must comply with CA/Browser Forum [CAB] Baseline Requirements.
 
-- as a Private CA for issuance of certificates within an organisation. The organisation could enforce whatever policies they desire on the ACME server.
+- as a Private CA for issuance of certificates within an organization. The organization could enforce whatever policies they desire on the ACME server.
 
 - for issuance of IoT device certificates. There are currently no IoT device certificate policies that are generally enforced across the industry. Organizations issuing IoT device certificates can enforce whatever policies they desire on the ACME server.
 

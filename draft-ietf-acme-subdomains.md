@@ -140,10 +140,6 @@ ACME server policy is out of scope of this document, however some commentary is 
 
 Clients need a mechanism to instruct the ACME server that they are requesting authorization for all subdomains subordinate to the specified domain, as opposed to just requesting authorization for an explicit domain identifier. Clients need a mechanism to do this in both newAuthz and newOrder requests. ACME servers need a mechanism to indicate to clients that authorization objects are valid for all subdomains under the specified domain. These are described in this section.
 
-## ACME Challenge Type
-
-ACME for subdomains is restricted for use with "dns-01" challenges. If a server policy allows a client to fulfill a challenge against a parent domain of a requested certificate FQDN identifier, then the server MUST issue a "dns-01" challenge against that parent domain.
-
 ## Authorization Object
 
 ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for subdomains subordinate to an domain, the server indicates this by including the "subdomains" flag in the authorization object for that domain identifier:

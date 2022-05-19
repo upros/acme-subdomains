@@ -566,6 +566,10 @@ Therefore, all Security Considerations in ACME in the following areas are equall
 
 Some additional comments on ACME server policy are given in the following section.
 
+## Subdomain Determination
+
+The {{?RFC8499}} definition of a subdomain is reproduced in {{terminology}}. When comparing domains to determine if one is a subdomain of the other, it is important to compare entire labels, and not rely on a string prefix match. Relying on string prefix matches may yield incorrect results.
+
 ## ACME Server Policy Considerations
 
 The ACME for Subdomains and the ACME specifications do not mandate any specific ACME server or CA policies, or any specific use cases for issuance of certificates. For example, an ACME server could be used:

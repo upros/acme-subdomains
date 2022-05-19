@@ -142,13 +142,13 @@ Clients need a mechanism to instruct the ACME server that they are requesting au
 
 ## Authorization Object
 
-ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for subdomains subordinate to a domain, the server indicates this by including the "subdomains" flag in the authorization object for that domain identifier:
+ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for subdomains subordinate to a domain, the server indicates this by including the "subdomainAuthAllowed" flag in the authorization object for that domain identifier:
 
 ~~~
-subdomains (optional, boolean):  This field MUST be present
-   and true for authorizations where ACME server policy allows
-   certificates to be issued for any subdomain subordinate to
-   the domain specified in the 'identifier' field of the
+subdomainAuthAllowed  (optional, boolean):  This field MUST be
+   present and true for authorizations where ACME server policy
+   allows certificates to be issued for any subdomain subordinate
+   to the domain specified in the 'identifier' field of the
    authorization object.
 ~~~
 
@@ -174,11 +174,11 @@ The following example shows an authorization object for the domain `example.org`
        }
      ],
 
-     "subdomains": true
+     "subdomainAuthAllowed": true
    }
 ~~~
 
-If the "subdomains" field is not included, then the assumed default value is false.
+If the "subdomainAuthAllowed" field is not included, then the assumed default value is false.
 
 ## Pre-Authorization
 
@@ -187,10 +187,10 @@ The standard ACME workflow has authorization objects created reactively in respo
 ACME {{?RFC8555}} section 7.4.1 defines the "identifier" object for newAuthz requests. One additional field for the "identifier" object is defined:
 
 ~~~
-subdomains (optional, boolean): An ACME client sets this flag
-   to indicate to the server that it is requesting an authorization
-   for the subdomains subordinate to the specified domain
-   identifier value
+subdomainAuthAllowed (optional, boolean): An ACME client sets
+   this flag to indicate to the server that it is requesting an 
+   authorization for the subdomains subordinate to the specified
+   domain identifier value
 ~~~
 
 Clients include the flag in the "identifier" object of newAuthz requests to indicate that they are requesting a subdomain authorization. In the following example newAuthz payload, the client is requesting pre-authorization for the subdomains subordinate to `example.org`.
@@ -200,12 +200,12 @@ Clients include the flag in the "identifier" object of newAuthz requests to indi
        "identifier": {
          "type": "dns",
          "value": "example.org",
-         "subdomains": true
+         "subdomainAuthAllowed": true
        }
      })
 ~~~
 
-If the server is willing to allow a single authorization for the subdomains, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "subdomains" flag with value of true. If the server policy does not allow creation of subdomain authorizations subordinate to that domain, the server can create an authorization object for the indicated identifier, and include the "subdomains" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
+If the server is willing to allow a single authorization for the subdomains, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "subdomainAuthAllowed" flag with value of true. If the server policy does not allow creation of subdomain authorizations subordinate to that domain, the server can create an authorization object for the indicated identifier, and include the "subdomainAuthAllowed" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
 
 ## New Orders
 
@@ -251,15 +251,15 @@ In the following example newOrder payload, the client requests a certificate for
 
 If the client is unable to fulfill authorizations against parent domain, the client should not include the "parentDomain" field.
 
-Server newOrder handling generally follows the process documented ACME section 7.4. If the server is willing to allow subdomain authorizations for the domain specified in "parentDomain", then it creates an authorization object against that parent domain and includes the "subdomains" flag with a value of true. If the server policy does not allow creation of subdomain authorizations against that parent domain, then it can create an authorization object for the indicated identifier value, and includes the "subdomains" flag with value of false.
+Server newOrder handling generally follows the process documented ACME section 7.4. If the server is willing to allow subdomain authorizations for the domain specified in "parentDomain", then it creates an authorization object against that parent domain and includes the "subdomainAuthAllowed" flag with a value of true. If the server policy does not allow creation of subdomain authorizations against that parent domain, then it can create an authorization object for the indicated identifier value, and includes the "subdomainAuthAllowed" flag with value of false.
 
 ## Directory Object Metadata
 
 An ACME server can advertise support for authorization of subdomains by including the following boolean flag in its "ACME Directory Metadata Fields" registry:
 
 ~~~
-subdomains (optional, bool): Indicates if an ACME server
-   supports authorization of subdomains.
+subdomainAuthAllowed (optional, bool): Indicates if an ACME 
+   server supports authorization of subdomains.
 ~~~
 
 If not specified, then no default value is assumed. If an ACME server supports authorization of subdomains, it can indicate this by including this field with a value of "true".
@@ -347,7 +347,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
 
 - STEP 1: Pre-authorization of parent domain
 
-   The client sends a newAuthz request for the parent domain including the "subdomains" flag in the identifier object.
+   The client sends a newAuthz request for the parent domain including the "subdomainAuthAllowed" flag in the identifier object.
 
 ~~~
    POST /acme/new-authz HTTP/1.1
@@ -365,14 +365,14 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
        "identifier": {
          "type": "dns",
          "value": "example.org",
-         "subdomains": true
+         "subdomainAuthAllowed": true
        }
      }),
      "signature": "nuSDISbWG8mMgE7H...QyVUL68yzf3Zawps"
    }
 ~~~
 
-   The server creates and returns an authorization object for the identifier including the "subdomains" flag. The object is initially in "pending" state.
+   The server creates and returns an authorization object for the identifier including the "subdomainAuthAllowed" flag. The object is initially in "pending" state.
 
 ~~~
    {
@@ -394,7 +394,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
        }
      ],
 
-     "subdomains": true
+     "subdomainAuthAllowed": true
    }
 ~~~
 
@@ -404,7 +404,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
 
 - STEP 2: The client places a newOrder for `sub1.example.org`
 
-   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the parent domain that has been pre-authorised in step 1. The client does not need to include the "subdomains" field in the "identifier" object as it has already pre-authorized the parent domain.
+   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the parent domain that has been pre-authorised in step 1. The client does not need to include the "subdomainAuthAllowed" field in the "identifier" object as it has already pre-authorized the parent domain.
 
 ~~~
    POST /acme/new-order HTTP/1.1
@@ -460,7 +460,7 @@ The client can proceed to finalize the order and download the certificate for `s
 
 - STEP 3: The client places a newOrder for `sub2.example.org`
 
-   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the parent domain that has been pre-authorised in step 1. The client does not need to include the "subdomains" field in the "identifier" object as it has already pre-authorized the parent domain.
+   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the parent domain that has been pre-authorised in step 1. The client does not need to include the "subdomainAuthAllowed" field in the "identifier" object as it has already pre-authorized the parent domain.
 
 ~~~
    POST /acme/new-order HTTP/1.1
@@ -520,21 +520,21 @@ The client can proceed to finalize the order and download the certificate for `s
 
 The following field is added to the "ACME Authorization Object Fields" registry defined in ACME {{?RFC8555}}.
 
-        +------------+------------+--------------+-----------+
-        | Field Name | Field Type | Configurable | Reference |
-        +------------+------------+--------------+-----------+
-        | subdomains | boolean    | false        | RFC XXXX  |
-        +------------+------------+--------------+-----------+
+        +----------------------+------------+--------------+-----------+
+        | Field Name           | Field Type | Configurable | Reference |
+        +----------------------+------------+--------------+-----------+
+        | subdomainAuthAllowed | boolean    | false        | RFC XXXX  |
+        +----------------------+------------+--------------+-----------+
 
 ## Directory Object Metadata Fields Registry
 
 The following field is added to the "ACME Directory Metadata Fields" registry defined in ACME {{?RFC8555}}.
 
-         +------------+------------+-----------+
-         | Field Name | Field Type | Reference |
-         +------------+------------+-----------+
-         | subdomains | boolean    | RFC XXXX  |
-         +------------+------------+-----------+
+         +----------------------+------------+-----------+
+         | Field Name           | Field Type | Reference |
+         +----------------------+------------+-----------+
+         | subdomainAuthAllowed | boolean    | RFC XXXX  |
+         +----------------------+------------+-----------+
 
 # Security Considerations
 

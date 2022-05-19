@@ -106,7 +106,7 @@ A typical ACME workflow for issuance of certificates is as follows:
 
 2. server replies with a set of "authorizations" and a "finalize" URI
 
-3. client sends POST-as-GET requests to retrieve the "authorizations", with the downloaded "authorization" object(s) containing the "identifier" that the client must prove that they control, and a set of associated "challenges", one of which the client must fulfil
+3. client sends POST-as-GET requests to retrieve the "authorizations", with the downloaded "authorization" object(s) containing the "identifier" that the client must prove that they control, and a set of associated "challenges", one of which the client must fulfill
 
 4. client proves control over the "identifier" in the "authorization" object by completing one of the specified challenges, for example, by publishing a DNS TXT record
 
@@ -209,14 +209,14 @@ If the server is willing to allow a single authorization for the subdomains, and
 
 ## New Orders
 
-Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against parent domains for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to update DNS TXT records against the parent domains `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent domains to the ACME server.
+Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against parent domains for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to fulfill a challenge against the parent domains `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent domains to the ACME server.
 
 This can be achieved by adding an optional field "parentDomain" to the "identifiers" field in the order object:
 
 ~~~
 parentDomain (optional, string): This is a parent domain of
-   the requested identifier. The client MUST have DNS
-   control over the parent domain.
+   the requested identifier. The client MUST be able to fulfill
+   a challenge against the parent domain.
 ~~~
 
 This field specifies a parent domain of the identifier that the client has DNS control over, and is capable of fulfilling challenges against. Based on server policy, the server can choose to issue a challenge against any parent domain of the identifier up to and including the specified "parentDomain", and create a corresponding authorization object against the chosen identifier.

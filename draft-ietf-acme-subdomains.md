@@ -92,7 +92,7 @@ The following terms are defined in DNS Terminology {{?RFC8499}} and are reproduc
 
 The following additional terms are used in this document:
 
-- Certification Authority (CA): An organization that is responsible for the creation, issuance, revocation, and management of Certificates. The term applies equally to both Root CAs and Subordinate CAs
+- Certification Authority (CA): An organization that is responsible for the creation, issuance, revocation, and management of Certificates. The term applies equally to both Root CAs and Subordinate CAs. Refer to {{?RFC5280}} for detailed information on Certification Authorities.
 
 - CSR: Certificate Signing Request as defined in {{?RFC2986}}
 

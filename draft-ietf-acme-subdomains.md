@@ -56,13 +56,13 @@ This document outlines how ACME can be used by a client to obtain a certificate 
 
 # Introduction
 
-ACME {{?RFC8555}} defines a protocol that a certification authority (CA) and an applicant can use to automate the process of domain name ownership validation and X.509v3 (PKIX) {{?RFC5280}} certificate issuance. This document outlines how ACME can be used to issue subdomain certificates, without requiring the ACME client to explicitly fulfill an ownership challenge against the subdomain identifiers - the ACME client need only fulfill an ownership challenge against a parent domain identifier.
+ACME {{!RFC8555}} defines a protocol that a certification authority (CA) and an applicant can use to automate the process of domain name ownership validation and X.509v3 (PKIX) {{?RFC5280}} certificate issuance. This document outlines how ACME can be used to issue subdomain certificates, without requiring the ACME client to explicitly fulfill an ownership challenge against the subdomain identifiers - the ACME client need only fulfill an ownership challenge against a parent domain identifier.
 
 # Terminology
 
-{::boilerplate bcp14}
+{::boilerplate bcp14-tagged}
 
-The following terms are defined in DNS Terminology {{?RFC8499}} and are reproduced here:
+The following terms are defined in DNS Terminology {{!RFC8499}} and are reproduced here:
 
 - Label: An ordered list of zero or more octets that makes up a
       portion of a domain name.  Using graph theory, a label identifies
@@ -73,7 +73,7 @@ The following terms are defined in DNS Terminology {{?RFC8499}} and are reproduc
 - Subdomain: "A domain is a subdomain of another domain if it is
       contained within that domain.  This relationship can be tested by
       seeing if the subdomain's name ends with the containing domain's
-      name."  (Quoted from {{?RFC1034}}, Section 3.1) For example, in the
+      name."  (Quoted from {{Section 3.1 of ?RFC1034}}.) For example, in the
       host name "nnn.mmm.example.com", both "mmm.example.com" and
       "nnn.mmm.example.com" are subdomains of "example.com".  Note that
       the comparisons here are done on whole labels; that is,
@@ -118,15 +118,15 @@ A typical ACME workflow for issuance of certificates is as follows:
 
 ACME places the following restrictions on "identifiers":
 
-- {{?RFC8555}} section 7.1.3: The authorizations required are dictated by server policy; there may not be a 1:1 relationship between the order identifiers and the authorizations required.
+- {{?RFC8555, Section 7.1.3}}: The authorizations required are dictated by server policy; there may not be a 1:1 relationship between the order identifiers and the authorizations required.
 
-- {{?RFC8555}} section 7.1.4: the only type of "identifier" defined by the ACME specification is an FQDN: "The only type of identifier defined by this specification is a fully qualified domain name (type: "dns"). The domain name MUST be encoded in the form in which it would appear in a certificate."
+- {{?RFC8555, Section 7.1.4}}: the only type of "identifier" defined by the ACME specification is an FQDN: "The only type of identifier defined by this specification is a fully qualified domain name (type: "dns"). The domain name MUST be encoded in the form in which it would appear in a certificate."
 
-- {{?RFC8555}} section 7.4: the "identifier" in the CSR request must match the "identifier" in the newOrder request: "The CSR MUST indicate the exact same set of requested identifiers as the initial newOrder request."
+- {{?RFC8555, Section 7.4}}: the "identifier" in the CSR request must match the "identifier" in the newOrder request: "The CSR MUST indicate the exact same set of requested identifiers as the initial newOrder request."
 
-- {{?RFC8555}} section 8.3: the "identifier", or FQDN, in the "authorization" object must be used when fulfilling challenges via HTTP: "Construct a URL by populating the URL template ... where the domain field is set to the domain name being verified"
+- {{?RFC8555, Section 8.3}}: the "identifier", or FQDN, in the "authorization" object must be used when fulfilling challenges via HTTP: "Construct a URL by populating the URL template ... where the domain field is set to the domain name being verified"
 
-- {{?RFC8555}} section 8.4: the "identifier", or FQDN, in the "authorization" object must be used when fulfilling challenges via DNS: "The client constructs the validation domain name by prepending the label "_acme-challenge" to the domain name being validated."
+- {{?RFC8555, Section 8.4}}: the "identifier", or FQDN, in the "authorization" object must be used when fulfilling challenges via DNS: "The client constructs the validation domain name by prepending the label "_acme-challenge" to the domain name being validated."
 
 ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects.
 
@@ -142,7 +142,7 @@ Clients need a mechanism to instruct the ACME server that they are requesting au
 
 ## Authorization Object
 
-ACME {{?RFC8555}} section 7.1.4 defines the authorization object. When ACME server policy allows authorization for subdomains subordinate to a domain, the server indicates this by including the "subdomainAuthAllowed" flag in the authorization object for that domain identifier:
+ACME ({{?RFC8555, Section 7.1.4}}) defines the authorization object. When ACME server policy allows authorization for subdomains subordinate to a domain, the server indicates this by including the "subdomainAuthAllowed" flag in the authorization object for that domain identifier:
 
 ~~~
 subdomainAuthAllowed  (optional, boolean):  This field MUST be
@@ -182,9 +182,9 @@ If the "subdomainAuthAllowed" field is not included, then the assumed default va
 
 ## Pre-Authorization
 
-The standard ACME workflow has authorization objects created reactively in response to a certificate order. ACME also allows for pre-authorization, where clients obtain authorization for an identifier proactively, outside of the context of a specific issuance. With the ACME pre-authorization flow, a client can pre-authorize for a domain once, and then issue multiple newOrder requests for certificates with identifiers in the subdomains subordinate to that domain.
+The basic ACME workflow has authorization objects created reactively in response to a certificate order. ACME also allows for pre-authorization, where clients obtain authorization for an identifier proactively, outside of the context of a specific issuance. With the ACME pre-authorization flow, a client can pre-authorize for a domain once, and then issue multiple newOrder requests for certificates with identifiers in the subdomains subordinate to that domain.
 
-ACME {{?RFC8555}} section 7.4.1 defines the "identifier" object for newAuthz requests. One additional field for the "identifier" object is defined:
+ACME {{RFC8555, Section 7.4.1}} defines the "identifier" object for newAuthz requests. One additional field for the "identifier" object is defined:
 
 ~~~
 subdomainAuthAllowed (optional, boolean): An ACME client sets
@@ -205,11 +205,11 @@ Clients include the flag in the "identifier" object of newAuthz requests to indi
      })
 ~~~
 
-If the server is willing to allow a single authorization for the subdomains, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "subdomainAuthAllowed" flag with value of true. If the server policy does not allow creation of subdomain authorizations subordinate to that domain, the server can create an authorization object for the indicated identifier, and include the "subdomainAuthAllowed" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME section 7.4.1.
+If the server is willing to allow a single authorization for the subdomains, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "subdomainAuthAllowed" flag with value of true. If the server policy does not allow creation of subdomain authorizations subordinate to that domain, the server can create an authorization object for the indicated identifier, and include the "subdomainAuthAllowed" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME {{RFC8555, Section 7.4.1}}.
 
 ## New Orders
 
-Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against parent domains for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to fulfill a challenge against the parent domains `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent domains to the ACME server.
+Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against a parent domains for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to fulfill a challenge against the parent domains `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent domains to the ACME server.
 
 This can be achieved by adding an optional field "parentDomain" to the "identifiers" field in the order object:
 
@@ -249,9 +249,9 @@ In the following example newOrder payload, the client requests a certificate for
      })
 ~~~
 
-If the client is unable to fulfill authorizations against parent domain, the client should not include the "parentDomain" field.
+If the client is unable to fulfill authorizations against a parent domain, the client should not include the "parentDomain" field.
 
-Server newOrder handling generally follows the process documented ACME section 7.4. If the server is willing to allow subdomain authorizations for the domain specified in "parentDomain", then it creates an authorization object against that parent domain and includes the "subdomainAuthAllowed" flag with a value of true. If the server policy does not allow creation of subdomain authorizations against that parent domain, then it can create an authorization object for the indicated identifier value, and includes the "subdomainAuthAllowed" flag with value of false.
+Server newOrder handling generally follows the process documented in ACME, {{Section 7.4 of RFC8555}}. If the server is willing to allow subdomain authorizations for the domain specified in "parentDomain", then it creates an authorization object against that parent domain and includes the "subdomainAuthAllowed" flag with a value of true. If the server policy does not allow creation of subdomain authorizations against that parent domain, then it can create an authorization object for the indicated identifier value, and includes the "subdomainAuthAllowed" flag with value of false.
 
 ## Directory Object Metadata
 
@@ -400,11 +400,11 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
 
    Once the client completes the challenge, the server will transition the authorization object and associated challenge object status to "valid". The call flow above illustrates the ACME server replying to the client's challenge with status of "valid" after the ACME server has validated the DNS challenge.
    
-   However, the validation flow may take some time. If this is the case, the ACME server may reply to the client's challenge immediately with a status of "processing", and the client will then need to poll the authorization resource to see when it is finalized. Refer to ACME {{?RFC8555}} section 7.5.1 for more details.
+   However, the validation flow may take some time. If this is the case, the ACME server may reply to the client's challenge immediately with a status of "processing", and the client will then need to poll the authorization resource to see when it is finalized. Refer to ACME {{RFC8555, Section 7.5.1}} for more details.
 
 - STEP 2: The client places a newOrder for `sub1.example.org`
 
-   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the parent domain that has been pre-authorised in step 1. The client does not need to include the "subdomainAuthAllowed" field in the "identifier" object as it has already pre-authorized the parent domain.
+   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the parent domain that has been pre-authorized in step 1. The client does not need to include the "subdomainAuthAllowed" field in the "identifier" object as it has already pre-authorized the parent domain.
 
 ~~~
    POST /acme/new-order HTTP/1.1
@@ -460,7 +460,7 @@ The client can proceed to finalize the order and download the certificate for `s
 
 - STEP 3: The client places a newOrder for `sub2.example.org`
 
-   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the parent domain that has been pre-authorised in step 1. The client does not need to include the "subdomainAuthAllowed" field in the "identifier" object as it has already pre-authorized the parent domain.
+   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the parent domain that has been pre-authorized in step 1. The client does not need to include the "subdomainAuthAllowed" field in the "identifier" object as it has already pre-authorized the parent domain.
 
 ~~~
    POST /acme/new-order HTTP/1.1

@@ -395,7 +395,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
      "challenges": [
        {
          "url": "https://example.com/acme/chall/prV_B7yEyA4",
-         "type": "http-01",
+         "type": "dns-01",
          "status": "pending",
          "token": "DGyRejmCefe7v4NfDGDKfA",
          "validated": "2014-12-01T12:05:58.16Z"
@@ -406,9 +406,11 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
    }
 ~~~
 
-   Once the client completes the challenge, the server will transition the authorization object and associated challenge object status to "valid". The call flow above illustrates the ACME server replying to the client's challenge with status of "valid" after the ACME server has validated the DNS challenge.
+   The example illustrates the client completing a DNS challenge by publishing a DNS TXT record. The client then posts to the challenge resource to inform the server that it can validate the challenge.
    
-   However, the validation flow may take some time. If this is the case, the ACME server may reply to the client's challenge immediately with a status of "processing", and the client will then need to poll the authorization resource to see when it is finalized. Refer to ACME {{RFC8555, Section 7.5.1}} for more details.
+   Once the server validates the challenge by checking the DNS TXT record, the server will transition the authorization object and associated challenge object status to "valid".
+   
+   The call flow above illustrates the ACME server replying to the client's challenge with status of "valid" after the ACME server has validated the DNS challenge. However, the validation flow may take some time. If this is the case, the ACME server may reply to the client's challenge immediately with a status of "processing", and the client will then need to poll the authorization resource to see when it is finalized. Refer to ACME {{RFC8555, Section 7.5.1}} for more details.
 
 - STEP 2: The client places a newOrder for `sub1.example.org`
 
@@ -464,7 +466,7 @@ As an authorization object already exists for the parent domain, the server repl
    }
 ~~~
 
-The client can proceed to finalize the order and download the certificate for `sub1.example.org`.
+The client can proceed to finalize the order by posting a CSR to the "finalize" resource. The client can then download the certificate for `sub1.example.org`.
 
 - STEP 3: The client places a newOrder for `sub2.example.org`
 
@@ -520,7 +522,7 @@ As an authorization object already exists for the parent domain, the server repl
    }
 ~~~
 
-The client can proceed to finalize the order and download the certificate for `sub2.example.org`.
+The client can proceed to finalize the order by posting a CSR to the "finalize" resource. The client can then download the certificate for `sub2.example.org`.
 
 # IANA Considerations
 

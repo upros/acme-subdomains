@@ -98,17 +98,25 @@ The following additional terms are used in this document:
 
 - Parent Domain: a domain is a parent domain of a subdomain if it contains that subdomain, as per the {{?RFC8499}} definition of subdomain. For example, for the host name "nnn.mmm.example.com", both "mmm.example.com" and "example.com" are parent domains of "nnn.mmm.example.com". Note that the comparisons here are done on whole labels; that is, "oo.example.com" is not a parent domain of "ooo.example.com"
 
+ACME {!RFC8555}} defines the following object types which are used in this document:
+
+- Order Object: An ACME order object represents a client's request for a certificate and is used to track the progress of that order through to issuance.
+
+- Authorization Object: An ACME authorization object represents a server's authorization for an account to represent an identifier.
+
+- Challenge Object: An ACME challenge object represents a server's offer to validate a client's possession of an identifier in a specific way.
+
 # ACME Workflow and Identifier Requirements
 
 A typical ACME workflow for issuance of certificates is as follows:
 
 1. client POSTs a newOrder request that contains a set of "identifiers"
 
-2. server replies with a set of "authorizations" and a "finalize" URI
+2. server replies with an order object that contains a set of links to authorization object(s) and a "finalize" URI
 
-3. client sends POST-as-GET requests to retrieve the "authorizations", with the downloaded "authorization" object(s) containing the "identifier" that the client must prove that they control, and a set of associated "challenges", one of which the client must fulfill
+3. client sends POST-as-GET requests to retrieve the authorization object(s), with the downloaded authorization object(s) containing the "identifier" that the client must prove that they control, and a set of links to associated challenges objects, one of which the client must fulfill
 
-4. client proves control over the "identifier" in the "authorization" object by completing one of the specified challenges, for example, by publishing a DNS TXT record
+4. client proves control over the "identifier" in the authorization object by completing one of the specified challenges, for example, by publishing a DNS TXT record
 
 5. client POSTs a CSR to the "finalize" API
 
@@ -124,15 +132,15 @@ ACME places the following restrictions on "identifiers":
 
 - {{?RFC8555, Section 7.4}}: the "identifier" in the CSR request must match the "identifier" in the newOrder request: "The CSR MUST indicate the exact same set of requested identifiers as the initial newOrder request."
 
-- {{?RFC8555, Section 8.3}}: the "identifier", or FQDN, in the "authorization" object must be used when fulfilling challenges via HTTP: "Construct a URL by populating the URL template ... where the domain field is set to the domain name being verified"
+- {{?RFC8555, Section 8.3}}: the "identifier", or FQDN, in the authorization object must be used when fulfilling challenges via HTTP: "Construct a URL by populating the URL template ... where the domain field is set to the domain name being verified"
 
-- {{?RFC8555, Section 8.4}}: the "identifier", or FQDN, in the "authorization" object must be used when fulfilling challenges via DNS: "The client constructs the validation domain name by prepending the label "_acme-challenge" to the domain name being validated."
+- {{?RFC8555, Section 8.4}}: the "identifier", or FQDN, in the authorization object must be used when fulfilling challenges via DNS: "The client constructs the validation domain name by prepending the label "_acme-challenge" to the domain name being validated."
 
-ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects.
+ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in authorization objects.
 
 # ACME Issuance of Subdomain Certificates
 
-As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in "authorization" objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain.
+As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in authorizationf objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain.
 
 ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for a parent domain of that subdomain. This allows a flow where a client proves ownership of, for example, "example.org" and then successfully obtains a certificate for "sub.example.org".
 

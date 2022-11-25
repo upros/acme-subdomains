@@ -217,7 +217,7 @@ If the server is willing to allow a single authorization for the subdomains, and
 
 ## New Orders
 
-Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against a parent domains for a given identifier FQDN. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to fulfill a challenge against the parent domains `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent domains to the ACME server.
+Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against a parent domain for a given identifier. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to fulfill a challenge against the parent domains `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent domains to the ACME server.
 
 This can be achieved by adding an optional field "parentDomain" to the "identifiers" field in the order object:
 

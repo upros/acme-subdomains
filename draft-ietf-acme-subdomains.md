@@ -233,7 +233,11 @@ Clients include the new "subdomainAuthAllowed" field in the "identifier" object 
      })
 ~~~
 
-If the server is willing to allow a single authorization for the subdomains, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "subdomainAuthAllowed" flag with value of true. If the server policy does not allow creation of subdomain authorizations subordinate to that domain, the server can create an authorization object for the indicated identifier, and include the "subdomainAuthAllowed" flag with value of false. In both scenarios, handling of the pre-authorization follows the process documented in ACME {{RFC8555, Section 7.4.1}}.
+If the server is willing to allow a single authorization for the subdomains, and there is not an existing authorization object for the identifier, then it will create an authorization object and include the "subdomainAuthAllowed" flag with value of true.
+
+If the server policy does not allow creation of subdomain authorizations subordinate to that domain, the server can create an authorization object for the indicated identifier, and MAY include the "subdomainAuthAllowed" flag with value of false. If the server creates an authorization object and does not include the "subdomainAuthAllowed" flag, then the assumed value is false.
+
+In both scenarios, handling of the pre-authorization follows the process documented in ACME {{RFC8555, Section 7.4.1}}.
 
 ## New Orders
 
@@ -279,7 +283,9 @@ In the following example newOrder payload, the client requests a certificate for
 
 If the client is unable to fulfill authorizations against a parent domain, the client should not include the "parentDomain" field.
 
-Server newOrder handling generally follows the process documented in ACME, {{Section 7.4 of RFC8555}}. If the server is willing to allow subdomain authorizations for the domain specified in "parentDomain", then it creates an authorization object against that parent domain and includes the "subdomainAuthAllowed" flag with a value of true. If the server policy does not allow creation of subdomain authorizations against that parent domain, then it can create an authorization object for the indicated identifier value, and includes the "subdomainAuthAllowed" flag with value of false.
+Server newOrder handling generally follows the process documented in ACME, {{Section 7.4 of RFC8555}}. If the server is willing to allow subdomain authorizations for the domain specified in "parentDomain", then it creates an authorization object against that parent domain and includes the "subdomainAuthAllowed" flag with a value of true.
+
+If the server policy does not allow creation of subdomain authorizations against that parent domain, then it can create an authorization object for the indicated identifier value, and SHOULD NOT include the "subdomainAuthAllowed" flag. As the client requested a subdomain authorization for the parent domain, and not for the indiciated identifier, there is no need for the server to include the "subdomainAuthAllowed" flag in the authorization object for the indicated identifier.
 
 ## Directory Object Metadata
 
@@ -290,7 +296,7 @@ subdomainAuthAllowed (optional, bool): Indicates if an ACME
    server supports authorization of subdomains.
 ~~~
 
-If not specified, then no default value is assumed. If an ACME server supports authorization of subdomains, it can indicate this by including this field with a value of "true".
+If not specified, then the assumed default value is false. If an ACME server supports authorization of subdomains, it can indicate this by including this field with a value of "true".
 
 # Illustrative Call Flow
 

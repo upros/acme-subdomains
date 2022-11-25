@@ -61,7 +61,7 @@ ACME Validation Methods:
 
 --- abstract
 
-This document specifies how Automated Certificate Management Environment (ACME) {{!RFC8555}} can be used by a client to obtain a certificate for a subdomain identifier from a certification authority. The client has fulfilled a challenge against a parent domain but does not need to fulfill a challenge against the explicit subdomain as certification authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
+This document specifies how Automated Certificate Management Environment (ACME) {{!RFC8555}} can be used by a client to obtain a certificate for a subdomain identifier from a certification authority. This document specifies how a client can fulfill a challenge against a parent domain but may not need to fulfill a challenge against the explicit subdomain if certification authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
 
 --- middle
 

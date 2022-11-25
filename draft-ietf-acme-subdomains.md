@@ -118,6 +118,10 @@ ACME {!RFC8555}} defines the following object types which are used in this docum
 
 - Challenge Object: An ACME challenge object represents a server's offer to validate a client's possession of an identifier in a specific way.
 
+ACME {!RFC8555}} Section 6.3 introduces the following term which is used in this document:
+
+- POST-as-GET Request: When a client wishes to fetch a resource from the server, then it MUST send a POST request with a signed JWS body, where the JWS body is specified in ACME {!RFC8555}} Section 6.2. ACME refers to these as "POST-as-GET" requests.
+
 # ACME Workflow and Identifier Requirements
 
 A typical ACME workflow for issuance of certificates is as follows:

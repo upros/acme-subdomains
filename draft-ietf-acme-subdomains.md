@@ -47,11 +47,17 @@ informative:
     title: Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates
     target: https://cabforum.org/wp-content/uploads/CA-Browser-Forum-BR-1.7.1.pdf
 
-  IANA:
+ACME Identifier Types:
     author:
       org: IANA
     title: ACME Identifier Types
     target: https://www.iana.org/assignments/acme/acme.xhtml#acme-identifier-types
+
+ACME Validation Methods:
+    author:
+      org: IANA
+    title: ACME Validation Methods
+    target: https://www.iana.org/assignments/acme/acme.xhtml#acme-validation-methods
 
 --- abstract
 
@@ -144,7 +150,9 @@ ACME {{!RFC8555}} places the following restrictions on "identifiers":
 
 ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in authorization objects.
 
-Note that the base ACME {{!RFC8555}} document only specifies the "dns" identifier type. Additional identifiers may be defined and registered in the [IANA] ACME Identifier Types registry. For example, {{?RFC8738}} specifies the "ip" identifier type. This document is only relevant for the "dns" identifier type.
+The base ACME {{!RFC8555}} document only specifies the "dns" identifier type. Additional identifiers may be defined and registered in the IANA [ACME Identifier Types] registry. For example, {{?RFC8738}} specifies the "ip" identifier type. This document is only relevant for the "dns" identifier type.
+
+Note also that ACME supports multiple different validation methods that can be used to fulfill challenges and prove ownership of identifiers. Validation methods are registered in the IANA [ACME Validation Methods] registry. This document does not mandate use of any particular validation method or methods. ACME server policy dictates which validation methods are supported. See {{acme-server-policy-considerations}} for more information on ACME server policy.
 
 # ACME Issuance of Subdomain Certificates
 
@@ -604,6 +612,6 @@ ACME server policy could specify whether:
 
 - issuance of subdomain certificates is allowed, but only for a specific set of parent domains
 
-- whether DNS based proof of ownership, or HTTP based proof of ownership, or both, are allowed
+- DNS based proof of ownership, or HTTP based proof of ownership, or both, are allowed
 
 ACME server policy specification is explicitly out of scope of this document.

@@ -124,7 +124,7 @@ ACME {!RFC8555}} Section 6.3 introduces the following term which is used in this
 
 # ACME Workflow and Identifier Requirements
 
-A typical ACME workflow for issuance of certificates is as follows:
+A typical ACME {{!RFC8555}} workflow for issuance of certificates is as follows:
 
 1. client POSTs a newOrder request that contains a set of "identifiers"
 
@@ -140,7 +140,7 @@ A typical ACME workflow for issuance of certificates is as follows:
 
 7. client sends POST-as-GET request to the "certificate" URI to download the certificate
 
-ACME {{!RFC8555}} places the following restrictions on "identifiers":
+ACME places the following restrictions on "identifiers":
 
 - {{!RFC8555, Section 7.1.3}}: The authorizations required are dictated by server policy; there may not be a 1:1 relationship between the order identifiers and the authorizations required.
 
@@ -160,7 +160,7 @@ Note also that ACME supports multiple different validation methods that can be u
 
 # ACME Issuance of Subdomain Certificates
 
-As noted in the previous section, ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in authorization objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain.
+As noted in the previous section, ACME {{!RFC8555}} does not mandate that the "identifier" in a newOrder request matches the "identifier" in authorization objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain.
 
 ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for a parent domain of that subdomain. This allows a flow where a client proves ownership of, for example, "example.org" and then successfully obtains a certificate for "sub.example.org".
 
@@ -170,7 +170,7 @@ Clients need a mechanism to instruct the ACME server that they are requesting au
 
 ## Authorization Object
 
-ACME ({{!RFC8555, Section 7.1.4}}) defines the authorization object. When ACME server policy allows authorization for subdomains subordinate to a domain, the server indicates this by including the "subdomainAuthAllowed" flag in the authorization object for that domain identifier:
+ACME ({{!RFC8555, Section 7.1.4}}) defines the authorization object. This document defines a new "subdomainAuthAllowed" field for the authorization object. When ACME server policy allows authorization for subdomains subordinate to a domain, the server indicates this by including the new "subdomainAuthAllowed" field in the authorization object for that domain identifier:
 
 ~~~
 subdomainAuthAllowed  (optional, boolean):  This field MUST be
@@ -212,7 +212,7 @@ If the "subdomainAuthAllowed" field is not included, then the assumed default va
 
 The basic ACME workflow has authorization objects created reactively in response to a certificate order. ACME also allows for pre-authorization, where clients obtain authorization for an identifier proactively, outside of the context of a specific issuance. With the ACME pre-authorization flow, a client can pre-authorize for a domain once, and then issue multiple newOrder requests for certificates with identifiers in the subdomains subordinate to that domain.
 
-ACME {{RFC8555, Section 7.4.1}} defines the "identifier" object for newAuthz requests. One additional field for the "identifier" object is defined:
+ACME {{RFC8555, Section 7.4.1}} defines the "identifier" object for newAuthz requests. This document defines a new "subdomainAuthAllowed" field for the "identifier" object:
 
 ~~~
 subdomainAuthAllowed (optional, boolean): An ACME client sets
@@ -221,7 +221,7 @@ subdomainAuthAllowed (optional, boolean): An ACME client sets
    domain identifier value
 ~~~
 
-Clients include the flag in the "identifier" object of newAuthz requests to indicate that they are requesting a subdomain authorization. In the following example newAuthz payload, the client is requesting pre-authorization for the subdomains subordinate to `example.org`.
+Clients include the new "subdomainAuthAllowed" field in the "identifier" object of newAuthz requests to indicate that they are requesting a subdomain authorization. In the following example newAuthz payload, the client is requesting pre-authorization for the subdomains subordinate to `example.org`.
 
 ~~~
      "payload": base64url({
@@ -239,7 +239,7 @@ If the server is willing to allow a single authorization for the subdomains, and
 
 Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against a parent domain for a given identifier. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to fulfill a challenge against the parent domains `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent domains to the ACME server.
 
-This can be achieved by adding an optional field "parentDomain" to the "identifiers" field in the order object:
+In order to accomplish this, this document defines a new "parentDomain" field for the identifier that is included in order objects.
 
 ~~~
 parentDomain (optional, string): This is a parent domain of
@@ -283,7 +283,7 @@ Server newOrder handling generally follows the process documented in ACME, {{Sec
 
 ## Directory Object Metadata
 
-An ACME server can advertise support for authorization of subdomains by including the following boolean flag in its "ACME Directory Metadata Fields" registry:
+This document defines a new "subdomainAuthAllowed" ACME directory metadata field. An ACME server can advertise support for authorization of subdomains by including the "subdomainAuthAllowed" boolean flag in its "ACME Directory Metadata Fields" registry:
 
 ~~~
 subdomainAuthAllowed (optional, bool): Indicates if an ACME 

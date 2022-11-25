@@ -47,6 +47,12 @@ informative:
     title: Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates
     target: https://cabforum.org/wp-content/uploads/CA-Browser-Forum-BR-1.7.1.pdf
 
+  IANA:
+    author:
+      org: IANA
+    title: ACME Identifier Types
+    target: https://www.iana.org/assignments/acme/acme.xhtml#acme-identifier-types
+
 --- abstract
 
 This document outlines how ACME can be used by a client to obtain a certificate for a subdomain identifier from a certification authority. The client has fulfilled a challenge against a parent domain but does not need to fulfill a challenge against the explicit subdomain as certification authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
@@ -124,19 +130,21 @@ A typical ACME workflow for issuance of certificates is as follows:
 
 7. client sends POST-as-GET request to the "certificate" URI to download the certificate
 
-ACME places the following restrictions on "identifiers":
+ACME {{!RFC8555}} places the following restrictions on "identifiers":
 
-- {{?RFC8555, Section 7.1.3}}: The authorizations required are dictated by server policy; there may not be a 1:1 relationship between the order identifiers and the authorizations required.
+- {{!RFC8555, Section 7.1.3}}: The authorizations required are dictated by server policy; there may not be a 1:1 relationship between the order identifiers and the authorizations required.
 
-- {{?RFC8555, Section 7.1.4}}: the only type of "identifier" defined by the ACME specification is an FQDN: "The only type of identifier defined by this specification is a fully qualified domain name (type: "dns"). The domain name MUST be encoded in the form in which it would appear in a certificate."
+- {{!RFC8555, Section 7.1.4}}: the only type of "identifier" defined by the ACME specification is an FQDN: "The only type of identifier defined by this specification is a fully qualified domain name (type: "dns"). The domain name MUST be encoded in the form in which it would appear in a certificate."
 
-- {{?RFC8555, Section 7.4}}: the "identifier" in the CSR request must match the "identifier" in the newOrder request: "The CSR MUST indicate the exact same set of requested identifiers as the initial newOrder request."
+- {{!RFC8555, Section 7.4}}: the "identifier" in the CSR request must match the "identifier" in the newOrder request: "The CSR MUST indicate the exact same set of requested identifiers as the initial newOrder request."
 
-- {{?RFC8555, Section 8.3}}: the "identifier", or FQDN, in the authorization object must be used when fulfilling challenges via HTTP: "Construct a URL by populating the URL template ... where the domain field is set to the domain name being verified"
+- {{!RFC8555, Section 8.3}}: the "identifier", or FQDN, in the authorization object must be used when fulfilling challenges via HTTP: "Construct a URL by populating the URL template ... where the domain field is set to the domain name being verified"
 
-- {{?RFC8555, Section 8.4}}: the "identifier", or FQDN, in the authorization object must be used when fulfilling challenges via DNS: "The client constructs the validation domain name by prepending the label "_acme-challenge" to the domain name being validated."
+- {{!RFC8555, Section 8.4}}: the "identifier", or FQDN, in the authorization object must be used when fulfilling challenges via DNS: "The client constructs the validation domain name by prepending the label "_acme-challenge" to the domain name being validated."
 
 ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in authorization objects.
+
+Note that the base ACME {{!RFC8555}} document only specifies the "dns" identifier type. Additional identifiers may be defined and registered in the [IANA] ACME Identifier Types registry. For example, {{?RFC8738}} specifies the "ip" identifier type. This document is only relevant for the "dns" identifier type.
 
 # ACME Issuance of Subdomain Certificates
 

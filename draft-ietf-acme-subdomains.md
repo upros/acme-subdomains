@@ -45,7 +45,7 @@ informative:
     author:
       org: CA/Browser Forum
     title: Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates
-    target: https://cabforum.org/wp-content/uploads/CA-Browser-Forum-BR-1.7.1.pdf
+    target: https://cabforum.org/baseline-requirements-documents/
 
 ACME Identifier Types:
     author:

@@ -108,7 +108,7 @@ The following additional terms are used in this document:
 
 - CSR: Certificate Signing Request as defined in {{?RFC2986}}
 
-- Parent Domain: a domain is a parent domain of a subdomain if it contains that subdomain, as per the {{?RFC8499}} definition of subdomain. For example, for the host name "nnn.mmm.example.com", both "mmm.example.com" and "example.com" are parent domains of "nnn.mmm.example.com". Note that the comparisons here are done on whole labels; that is, "oo.example.com" is not a parent domain of "ooo.example.com"
+- Parent Domain: a domain is a parent domain of a subdomain if it contains that subdomain, as per the {{!RFC8499}} definition of subdomain. For example, for the host name "nnn.mmm.example.com", both "mmm.example.com" and "example.com" are parent domains of "nnn.mmm.example.com". Note that the comparisons here are done on whole labels; that is, "oo.example.com" is not a parent domain of "ooo.example.com"
 
 ACME {!RFC8555}} defines the following object types which are used in this document:
 
@@ -166,7 +166,7 @@ Clients need a mechanism to instruct the ACME server that they are requesting au
 
 ## Authorization Object
 
-ACME ({{?RFC8555, Section 7.1.4}}) defines the authorization object. When ACME server policy allows authorization for subdomains subordinate to a domain, the server indicates this by including the "subdomainAuthAllowed" flag in the authorization object for that domain identifier:
+ACME ({{!RFC8555, Section 7.1.4}}) defines the authorization object. When ACME server policy allows authorization for subdomains subordinate to a domain, the server indicates this by including the "subdomainAuthAllowed" flag in the authorization object for that domain identifier:
 
 ~~~
 subdomainAuthAllowed  (optional, boolean):  This field MUST be
@@ -544,7 +544,7 @@ The client can proceed to finalize the order by posting a CSR to the "finalize" 
 
 ## Authorization Object Fields Registry
 
-The following field is added to the "ACME Authorization Object Fields" registry defined in ACME {{?RFC8555}}.
+The following field is added to the "ACME Authorization Object Fields" registry defined in ACME {{!RFC8555}}.
 
         +----------------------+------------+--------------+-----------+
         | Field Name           | Field Type | Configurable | Reference |
@@ -554,7 +554,7 @@ The following field is added to the "ACME Authorization Object Fields" registry 
 
 ## Directory Object Metadata Fields Registry
 
-The following field is added to the "ACME Directory Metadata Fields" registry defined in ACME {{?RFC8555}}.
+The following field is added to the "ACME Directory Metadata Fields" registry defined in ACME {{!RFC8555}}.
 
          +----------------------+------------+-----------+
          | Field Name           | Field Type | Reference |
@@ -564,7 +564,7 @@ The following field is added to the "ACME Directory Metadata Fields" registry de
 
 # Security Considerations
 
-This document documents enhancements to ACME {{?RFC8555}} that optimize the protocol flows for issuance of certificates for subdomains. The underlying goal of ACME for Subdomains remains the same as that of ACME: managing certificates that attest to identifier/key bindings for these subdomains. Thus, ACME for Subdomains has the same two security goals as ACME:
+This document documents enhancements to ACME {{!RFC8555}} that optimize the protocol flows for issuance of certificates for subdomains. The underlying goal of ACME for Subdomains remains the same as that of ACME: managing certificates that attest to identifier/key bindings for these subdomains. Thus, ACME for Subdomains has the same two security goals as ACME:
 
 1. Only an entity that controls an identifier can get an authorization for that identifier
 
@@ -594,7 +594,7 @@ Some additional comments on ACME server policy are given in the following sectio
 
 ## Subdomain Determination
 
-The {{?RFC8499}} definition of a subdomain is reproduced in {{terminology}}. When comparing domains to determine if one is a subdomain of the other, it is important to compare entire labels, and not rely on a string prefix match. Relying on string prefix matches may yield incorrect results.
+The {{!RFC8499}} definition of a subdomain is reproduced in {{terminology}}. When comparing domains to determine if one is a subdomain of the other, it is important to compare entire labels, and not rely on a string prefix match. Relying on string prefix matches may yield incorrect results.
 
 ## ACME Server Policy Considerations
 

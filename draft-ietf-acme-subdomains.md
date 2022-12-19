@@ -82,15 +82,6 @@ The following terms are defined in DNS Terminology {{!RFC8499}} and are reproduc
 
 - Domain Name: An ordered list of one or more labels.
 
-- Subdomain: "A domain is a subdomain of another domain if it is
-      contained within that domain.  This relationship can be tested by
-      seeing if the subdomain's name ends with the containing domain's
-      name."  (Quoted from {{Section 3.1 of ?RFC1034}}.) For example, in the
-      host name "nnn.mmm.example.com", both "mmm.example.com" and
-      "nnn.mmm.example.com" are subdomains of "example.com".  Note that
-      the comparisons here are done on whole labels; that is,
-      "ooo.example.com" is not a subdomain of "oo.example.com".
-
 - Fully-Qualified Domain Name (FQDN):  This is often just a clear way
       of saying the same thing as "domain name of a node", as outlined
       above.  However, the term is ambiguous.  Strictly speaking, a
@@ -101,6 +92,19 @@ The following terms are defined in DNS Terminology {{!RFC8499}} and are reproduc
       relative to the root (such as "www.example.net") and are still
       called "fully qualified".  This term first appeared in {{?RFC0819}}.
       In this document, names are often written relative to the root.
+
+The following definition for "subdomain" is taken from DNS Terminology {{!RFC8499}} and reproduced here, however the definition is ambiguous and is further clarified below:
+
+- Subdomain: "A domain is a subdomain of another domain if it is
+      contained within that domain.  This relationship can be tested by
+      seeing if the subdomain's name ends with the containing domain's
+      name."  (Quoted from {{Section 3.1 of ?RFC1034}}.) For example, in the
+      host name "nnn.mmm.example.com", both "mmm.example.com" and
+      "nnn.mmm.example.com" are subdomains of "example.com".  Note that
+      the comparisons here are done on whole labels; that is,
+      "ooo.example.com" is not a subdomain of "oo.example.com".
+      
+The definition is ambiguous as it appears to allow a subdomain to include the given domain. That is, "mmm.example.com" ends with "mmm.example.com" and thus is a subdomain of itself. This document interprets the first sentence of the above definition as meaning "A domain is a subdomain of a different domain if it is contained within that different domain.". A domain cannot be a subdomain of itself. For example,  "mmm.example.com" is not a subdomain of "mmm.example.com".
 
 The following additional terms are used in this document:
 

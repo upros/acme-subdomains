@@ -598,7 +598,11 @@ Therefore, all Security Considerations in ACME in the following areas are equall
 
 - CA Policy Considerations
 
-Some additional comments on ACME server policy are given in the following section.
+The only exception is that in order to satisfy goal (1) above, this draft assumes that control over a domain implies control over a subdomain, and therefore authorization for certificate issuance for the former implies authorization for certificate issuance for the latter.  In many ecosystems, this is a safe assumption, especially because control over the domain can often be leveraged to successfully demonstrate control over subdomains anyway, for example by temporarily modifying DNS for the subdomain to point to a server the parent domain owner controls, rendering the distinction moot.  For example, the CA/Browser Forum Baseline Requirements considers control of the parent domain sufficient for issuance of certificates for subdomains.
+
+In ecosystems where control of a parent domain may not imply control over subdomains or authorization for issuance of certificates for subdomains, a more complicated threat analysis and server policy might be needed.
+
+Some additional comments on ACME server policy are given later in this section.
 
 ## Subdomain Determination
 

@@ -61,7 +61,7 @@ ACME Validation Methods:
 
 --- abstract
 
-This document specifies how Automated Certificate Management Environment (ACME) {{!RFC8555}} can be used by a client to obtain a certificate for a subdomain identifier from a certification authority. This document specifies how a client can fulfill a challenge against an ancestor domain but may not need to fulfill a challenge against the explicit subdomain if certification authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
+This document specifies how Automated Certificate Management Environment (ACME) can be used by a client to obtain a certificate for a subdomain identifier from a certification authority. This document specifies how a client can fulfill a challenge against an ancestor domain but may not need to fulfill a challenge against the explicit subdomain if certification authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
 
 --- middle
 
@@ -112,9 +112,9 @@ The following additional terms are used in this document:
 
 - CSR: Certificate Signing Request as defined in {{?RFC2986}}
 
-- Acnestor Domain: a domain is an ancestor domain of a subdomain if it contains that subdomain, as per the {{!RFC8499}} definition of subdomain. For example, for the host name "nnn.mmm.example.com", both "mmm.example.com" and "example.com" are ancestor domains of "nnn.mmm.example.com". Note that the comparisons here are done on whole labels; that is, "oo.example.com" is not an ancestor domain of "ooo.example.com"
+- Ancestor Domain: a domain is an ancestor domain of a subdomain if it contains that subdomain, as per the {{!RFC8499}} definition of subdomain. For example, for the host name "nnn.mmm.example.com", both "mmm.example.com" and "example.com" are ancestor domains of "nnn.mmm.example.com". Note that the comparisons here are done on whole labels; that is, "oo.example.com" is not an ancestor domain of "ooo.example.com"
 
-ACME {!RFC8555}} defines the following object types which are used in this document:
+ACME {{!RFC8555}} defines the following object types which are used in this document:
 
 - Order Object: An ACME order object represents a client's request for a certificate and is used to track the progress of that order through to issuance.
 
@@ -122,9 +122,9 @@ ACME {!RFC8555}} defines the following object types which are used in this docum
 
 - Challenge Object: An ACME challenge object represents a server's offer to validate a client's possession of an identifier in a specific way.
 
-ACME {!RFC8555}} Section 6.3 introduces the following term which is used in this document:
+ACME {{!RFC8555}} Section 6.3 introduces the following term which is used in this document:
 
-- POST-as-GET Request: When a client wishes to fetch a resource from the server, then it MUST send a POST request with a signed JWS body, where the JWS body is specified in ACME {!RFC8555}} Section 6.2. ACME refers to these as "POST-as-GET" requests.
+- POST-as-GET Request: When a client wishes to fetch a resource from the server, then it MUST send a POST request with a signed JWS body, where the JWS body is specified in ACME {{!RFC8555}} Section 6.2. ACME refers to these as "POST-as-GET" requests.
 
 # ACME Workflow and Identifier Requirements
 

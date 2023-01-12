@@ -61,14 +61,14 @@ ACME Validation Methods:
 
 --- abstract
 
-This document specifies how Automated Certificate Management Environment (ACME) {{!RFC8555}} can be used by a client to obtain a certificate for a subdomain identifier from a certification authority. This document specifies how a client can fulfill a challenge against a parent domain but may not need to fulfill a challenge against the explicit subdomain if certification authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
+This document specifies how Automated Certificate Management Environment (ACME) {{!RFC8555}} can be used by a client to obtain a certificate for a subdomain identifier from a certification authority. This document specifies how a client can fulfill a challenge against an ancestor domain but may not need to fulfill a challenge against the explicit subdomain if certification authority policy allows issuance of the subdomain certificate without explicit subdomain ownership proof.
 
 --- middle
 
 
 # Introduction
 
-ACME {{!RFC8555}} defines a protocol that a certification authority (CA) and an applicant can use to automate the process of domain name ownership validation and X.509v3 (PKIX) {{?RFC5280}} certificate issuance. The CA is the ACME server and the applicant is the ACME client, and the client uses the ACME protocol to request certificate issuance from the server. This document outlines how ACME can be used to issue subdomain certificates, without requiring the ACME client to explicitly fulfill an ownership challenge against the subdomain identifiers - the ACME client need only fulfill an ownership challenge against a parent domain identifier.
+ACME {{!RFC8555}} defines a protocol that a certification authority (CA) and an applicant can use to automate the process of domain name ownership validation and X.509v3 (PKIX) {{?RFC5280}} certificate issuance. The CA is the ACME server and the applicant is the ACME client, and the client uses the ACME protocol to request certificate issuance from the server. This document outlines how ACME can be used to issue subdomain certificates, without requiring the ACME client to explicitly fulfill an ownership challenge against the subdomain identifiers - the ACME client need only fulfill an ownership challenge against an ancestor domain identifier.
 
 # Terminology
 
@@ -82,15 +82,6 @@ The following terms are defined in DNS Terminology {{!RFC8499}} and are reproduc
 
 - Domain Name: An ordered list of one or more labels.
 
-- Subdomain: "A domain is a subdomain of another domain if it is
-      contained within that domain.  This relationship can be tested by
-      seeing if the subdomain's name ends with the containing domain's
-      name."  (Quoted from {{Section 3.1 of ?RFC1034}}.) For example, in the
-      host name "nnn.mmm.example.com", both "mmm.example.com" and
-      "nnn.mmm.example.com" are subdomains of "example.com".  Note that
-      the comparisons here are done on whole labels; that is,
-      "ooo.example.com" is not a subdomain of "oo.example.com".
-
 - Fully-Qualified Domain Name (FQDN):  This is often just a clear way
       of saying the same thing as "domain name of a node", as outlined
       above.  However, the term is ambiguous.  Strictly speaking, a
@@ -102,13 +93,26 @@ The following terms are defined in DNS Terminology {{!RFC8499}} and are reproduc
       called "fully qualified".  This term first appeared in {{?RFC0819}}.
       In this document, names are often written relative to the root.
 
+The following definition for "subdomain" is taken from DNS Terminology {{!RFC8499}} and reproduced here, however the definition is ambiguous and is further clarified below:
+
+- Subdomain: "A domain is a subdomain of another domain if it is
+      contained within that domain.  This relationship can be tested by
+      seeing if the subdomain's name ends with the containing domain's
+      name."  (Quoted from {{Section 3.1 of ?RFC1034}}.) For example, in the
+      host name "nnn.mmm.example.com", both "mmm.example.com" and
+      "nnn.mmm.example.com" are subdomains of "example.com".  Note that
+      the comparisons here are done on whole labels; that is,
+      "ooo.example.com" is not a subdomain of "oo.example.com".
+      
+The definition is ambiguous as it appears to allow a subdomain to include the given domain. That is, "mmm.example.com" ends with "mmm.example.com" and thus is a subdomain of itself. This document interprets the first sentence of the above definition as meaning "A domain is a subdomain of a different domain if it is contained within that different domain.". A domain cannot be a subdomain of itself. For example,  "mmm.example.com" is not a subdomain of "mmm.example.com".
+
 The following additional terms are used in this document:
 
 - Certification Authority (CA): An organization that is responsible for the creation, issuance, revocation, and management of Certificates. The term applies equally to both Root CAs and Subordinate CAs. Refer to {{?RFC5280}} for detailed information on Certification Authorities.
 
 - CSR: Certificate Signing Request as defined in {{?RFC2986}}
 
-- Parent Domain: a domain is a parent domain of a subdomain if it contains that subdomain, as per the {{!RFC8499}} definition of subdomain. For example, for the host name "nnn.mmm.example.com", both "mmm.example.com" and "example.com" are parent domains of "nnn.mmm.example.com". Note that the comparisons here are done on whole labels; that is, "oo.example.com" is not a parent domain of "ooo.example.com"
+- Acnestor Domain: a domain is an ancestor domain of a subdomain if it contains that subdomain, as per the {{!RFC8499}} definition of subdomain. For example, for the host name "nnn.mmm.example.com", both "mmm.example.com" and "example.com" are ancestor domains of "nnn.mmm.example.com". Note that the comparisons here are done on whole labels; that is, "oo.example.com" is not an ancestor domain of "ooo.example.com"
 
 ACME {!RFC8555}} defines the following object types which are used in this document:
 
@@ -162,7 +166,7 @@ Note also that ACME supports multiple different validation methods that can be u
 
 As noted in the previous section, ACME {{!RFC8555}} does not mandate that the "identifier" in a newOrder request matches the "identifier" in authorization objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain.
 
-ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for a parent domain of that subdomain. This allows a flow where a client proves ownership of, for example, "example.org" and then successfully obtains a certificate for "sub.example.org".
+ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for an ancestor domain of that subdomain. This allows a flow where a client proves ownership of, for example, "example.org" and then successfully obtains a certificate for "sub.example.org".
 
 ACME server policy is out of scope of this document, however, some commentary is provided in {{acme-server-policy-considerations}}.
 
@@ -241,47 +245,47 @@ In both scenarios, handling of the pre-authorization follows the process documen
 
 ## New Orders
 
-Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against a parent domain for a given identifier. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to fulfill a challenge against the parent domains `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the parent domains to the ACME server.
+Clients need a mechanism to optionally indicate to servers whether or not they are authorized to fulfill challenges against an ancestor domain for a given identifier. For example, if a client places an order for an identifier `foo.bar.example.org`, and is authorized to fulfill a challenge against the ancestor domains `bar.example.org` or `example.org`, then the client needs a mechanism to indicate control over the ancestor domains to the ACME server.
 
-In order to accomplish this, this document defines a new "parentDomain" field for the identifier that is included in order objects.
+In order to accomplish this, this document defines a new "ancestorDomain" field for the identifier that is included in order objects.
 
 ~~~
-parentDomain (optional, string): This is a parent domain of
+ancestorDomain (optional, string): This is an ancestor domain of
    the requested identifier. The client MUST be able to fulfill
-   a challenge against the parent domain.
+   a challenge against the ancestor domain.
 ~~~
 
-This field specifies a parent domain of the identifier that the client has DNS control over, and is capable of fulfilling challenges against. Based on server policy, the server can choose to issue a challenge against any parent domain of the identifier up to and including the specified "parentDomain", and create a corresponding authorization object against the chosen identifier.
+This field specifies an ancestor domain of the identifier that the client has DNS control over, and is capable of fulfilling challenges against. Based on server policy, the server can choose to issue a challenge against any ancestor domain of the identifier up to and including the specified "ancestorDomain", and create a corresponding authorization object against the chosen identifier.
 
-In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent domain `bar.example.org`. The server can then choose to issue a challenge against either `foo.bar.example.org` or `bar.example.org` identifiers.
-
-~~~
-"payload": base64url({
-       "identifiers": [
-         { "type": "dns",
-           "value": "foo.bar.example.org",
-           "parentDomain": "bar.example.org"  }
-       ],
-       "notBefore": "2016-01-01T00:04:00+04:00",
-       "notAfter": "2016-01-08T00:04:00+04:00"
-     })
-~~~
-
-In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the parent domain `example.org`. The server can then choose to issue a challenge against any one of `foo.bar.example.org`, `bar.example.org` or `example.org` identifiers.
+In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the ancestor domain `bar.example.org`. The server can then choose to issue a challenge against either `foo.bar.example.org` or `bar.example.org` identifiers.
 
 ~~~
 "payload": base64url({
        "identifiers": [
          { "type": "dns",
            "value": "foo.bar.example.org",
-           "parentDomain": "example.org"  }
+           "ancestorDomain": "bar.example.org"  }
        ],
        "notBefore": "2016-01-01T00:04:00+04:00",
        "notAfter": "2016-01-08T00:04:00+04:00"
      })
 ~~~
 
-If the client is unable to fulfill authorizations against a parent domain, the client should not include the "parentDomain" field.
+In the following example newOrder payload, the client requests a certificate for identifier `foo.bar.example.org` and indicates that it can fulfill a challenge against the ancestor domain `example.org`. The server can then choose to issue a challenge against any one of `foo.bar.example.org`, `bar.example.org` or `example.org` identifiers.
+
+~~~
+"payload": base64url({
+       "identifiers": [
+         { "type": "dns",
+           "value": "foo.bar.example.org",
+           "ancestorDomain": "example.org"  }
+       ],
+       "notBefore": "2016-01-01T00:04:00+04:00",
+       "notAfter": "2016-01-08T00:04:00+04:00"
+     })
+~~~
+
+If the client is unable to fulfill authorizations against an ancestor domain, the client should not include the "ancestorDomain" field.
 
 Server newOrder handling generally follows the process documented in ACME, {{Section 7.4 of RFC8555}}. If the server is willing to allow subdomain authorizations for the domain specified in "parentDomain", then it creates an authorization object against that parent domain and includes the "subdomainAuthAllowed" flag with a value of true.
 
@@ -308,7 +312,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
 | Client |                   | ACME |     | DNS |
 +--------+                   +------+     +-----+
     |                            |           |
- STEP 1: Pre-Authorization of parent domain
+ STEP 1: Pre-Authorization of ancestor domain
     |                            |           |
     | POST /newAuthz             |           |
     | "example.org"              |           |
@@ -379,9 +383,9 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
     |<---------------------------|           |
 ~~~
 
-- STEP 1: Pre-authorization of parent domain
+- STEP 1: Pre-authorization of ancestor domain
 
-   The client sends a newAuthz request for the parent domain including the "subdomainAuthAllowed" flag in the identifier object.
+   The client sends a newAuthz request for the ancestor domain including the "subdomainAuthAllowed" flag in the identifier object.
 
 ~~~
    POST /acme/new-authz HTTP/1.1
@@ -440,7 +444,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
 
 - STEP 2: The client places a newOrder for `sub1.example.org`
 
-   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the parent domain that has been pre-authorized in step 1. The client does not need to include the "subdomainAuthAllowed" field in the "identifier" object as it has already pre-authorized the parent domain.
+   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the ancestor domain that has been pre-authorized in step 1. The client does not need to include the "subdomainAuthAllowed" field in the "identifier" object as it has already pre-authorized the ancestor domain.
 
 ~~~
    POST /acme/new-order HTTP/1.1
@@ -465,7 +469,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
    }
 ~~~
 
-As an authorization object already exists for the parent domain, the server replies with an order object with a status of "ready" that includes a link to the existing "valid" authorization object.
+As an authorization object already exists for the ancestor domain, the server replies with an order object with a status of "ready" that includes a link to the existing "valid" authorization object.
 
 ~~~
    HTTP/1.1 201 Created
@@ -496,7 +500,7 @@ The client can proceed to finalize the order by posting a CSR to the "finalize" 
 
 - STEP 3: The client places a newOrder for `sub2.example.org`
 
-   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the parent domain that has been pre-authorized in step 1. The client does not need to include the "subdomainAuthAllowed" field in the "identifier" object as it has already pre-authorized the parent domain.
+   The client sends a newOrder request to the server and includes the subdomain identifier. Note that the identifier is a subdomain of the ancestor domain that has been pre-authorized in step 1. The client does not need to include the "subdomainAuthAllowed" field in the "identifier" object as it has already pre-authorized the ancestor domain.
 
 ~~~
    POST /acme/new-order HTTP/1.1
@@ -521,7 +525,7 @@ The client can proceed to finalize the order by posting a CSR to the "finalize" 
    }
 ~~~
 
-As an authorization object already exists for the parent domain, the server replies with an order object with a status of "ready" that includes a link to the existing "valid" authorization object.
+As an authorization object already exists for the ancestor domain, the server replies with an order object with a status of "ready" that includes a link to the existing "valid" authorization object.
 
 ~~~
    HTTP/1.1 201 Created
@@ -600,7 +604,11 @@ Therefore, all Security Considerations in ACME in the following areas are equall
 
 - CA Policy Considerations
 
-Some additional comments on ACME server policy are given in the following section.
+The only exception is that in order to satisfy goal (1) above, this draft assumes that control over a domain implies control over a subdomain, and therefore authorization for certificate issuance for the former implies authorization for certificate issuance for the latter.  In many ecosystems, this is a safe assumption, especially because control over the domain can often be leveraged to successfully demonstrate control over subdomains anyway, for example by temporarily modifying DNS for the subdomain to point to a server the parent domain owner controls, rendering the distinction moot.  For example, the CA/Browser Forum Baseline Requirements considers control of the parent domain sufficient for issuance of certificates for subdomains.
+
+In ecosystems where control of a parent domain may not imply control over subdomains or authorization for issuance of certificates for subdomains, a more complicated threat analysis and server policy might be needed.
+
+Some additional comments on ACME server policy are given later in this section.
 
 ## Subdomain Determination
 
@@ -618,9 +626,9 @@ The ACME for Subdomains and the ACME specifications do not mandate any specific 
 
 ACME server policy could specify whether:
 
-- issuance of subdomain certificates is allowed based on proof of ownership of a parent domain
+- issuance of subdomain certificates is allowed based on proof of ownership of an ancestor domain
 
-- issuance of subdomain certificates is allowed, but only for a specific set of parent domains
+- issuance of subdomain certificates is allowed, but only for a specific set of ancestor domains
 
 - DNS based proof of ownership, or HTTP based proof of ownership, or both, are allowed
 

@@ -189,7 +189,7 @@ The following example shows an authorization object for the domain `example.org`
 ~~~
    {
      "status": "valid",
-     "expires": "2015-03-01T14:09:07.99Z",
+     "expires": "2023-09-01T14:09:07.99Z",
 
      "identifier": {
        "type": "dns",
@@ -266,8 +266,8 @@ In the following example newOrder payload, the client requests a certificate for
            "value": "foo.bar.example.org",
            "ancestorDomain": "bar.example.org"  }
        ],
-       "notBefore": "2016-01-01T00:04:00+04:00",
-       "notAfter": "2016-01-08T00:04:00+04:00"
+       "notBefore": "2023-09-01T00:04:00+04:00",
+       "notAfter": "2023-09-08T00:04:00+04:00"
      })
 ~~~
 
@@ -280,8 +280,8 @@ In the following example newOrder payload, the client requests a certificate for
            "value": "foo.bar.example.org",
            "ancestorDomain": "example.org"  }
        ],
-       "notBefore": "2016-01-01T00:04:00+04:00",
-       "notAfter": "2016-01-08T00:04:00+04:00"
+       "notBefore": "2023-09-01T00:04:00+04:00",
+       "notAfter": "2023-09-08T00:04:00+04:00"
      })
 ~~~
 
@@ -415,7 +415,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
 ~~~
    {
      "status": "pending",
-     "expires": "2015-03-01T14:09:07.99Z",
+     "expires": "2023-09-01T14:09:07.99Z",
 
      "identifier": {
        "type": "dns",
@@ -428,7 +428,7 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
          "type": "dns-01",
          "status": "pending",
          "token": "DGyRejmCefe7v4NfDGDKfA",
-         "validated": "2014-12-01T12:05:58.16Z"
+         "validated": "2023-08-01T12:05:58.16Z"
        }
      ],
 
@@ -462,8 +462,8 @@ The call flow illustrated here uses the ACME pre-authorization flow using DNS-ba
        "identifiers": [
          { "type": "dns", "value": "sub1.example.org" }
        ],
-       "notBefore": "2016-01-01T00:04:00+04:00",
-       "notAfter": "2016-01-08T00:04:00+04:00"
+       "notBefore": "2023-09-01T00:04:00+04:00",
+       "notAfter": "2023-09-08T00:04:00+04:00"
      }),
      "signature": "H6ZXtGjTZyUnPeKn...wEA4TklBdh3e454g"
    }
@@ -479,10 +479,10 @@ As an authorization object already exists for the ancestor domain, the server re
 
    {
      "status": "ready",
-     "expires": "2016-01-05T14:09:07.99Z",
+     "expires": "2023-09-01T14:09:07.99Z",
 
-     "notBefore": "2016-01-01T00:00:00Z",
-     "notAfter": "2016-01-08T00:00:00Z",
+     "notBefore": "2023-09-01T00:00:00Z",
+     "notAfter": "2023-09-08T00:00:00Z",
 
      "identifiers": [
        { "type": "dns", "value": "sub1.example.org" }
@@ -518,8 +518,8 @@ The client can proceed to finalize the order by posting a CSR to the "finalize" 
        "identifiers": [
          { "type": "dns", "value": "sub2.example.org" }
        ],
-       "notBefore": "2016-01-01T00:04:00+04:00",
-       "notAfter": "2016-01-08T00:04:00+04:00"
+       "notBefore": "2023-09-01T00:04:00+04:00",
+       "notAfter": "2023-09-08T00:04:00+04:00"
      }),
      "signature": "H6ZXtGjTZyUnPeKn...wEA4TklBdh3e454g"
    }
@@ -535,10 +535,10 @@ As an authorization object already exists for the ancestor domain, the server re
 
    {
      "status": "ready",
-     "expires": "2016-01-05T14:09:07.99Z",
+     "expires": "2023-09-01T14:09:07.99Z",
 
-     "notBefore": "2016-01-01T00:00:00Z",
-     "notAfter": "2016-01-08T00:00:00Z",
+     "notBefore": "2023-09-01T00:00:00Z",
+     "notAfter": "2023-09-08T00:00:00Z",
 
      "identifiers": [
        { "type": "dns", "value": "sub2.example.org" }

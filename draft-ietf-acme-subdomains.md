@@ -177,8 +177,8 @@ Clients need a mechanism to instruct the ACME server that they are requesting au
 ACME ({{!RFC8555, Section 7.1.4}}) defines the authorization object. This document defines a new "subdomainAuthAllowed" field for the authorization object. When ACME server policy allows authorization for subdomains subordinate to a domain, the server indicates this by including the new "subdomainAuthAllowed" field in the authorization object for that domain identifier:
 
 ~~~
-subdomainAuthAllowed  (optional, boolean):  This field MUST be
-   present and true for authorizations where ACME server policy
+subdomainAuthAllowed  (optional, boolean):  If present, this field
+   MUST be true for authorizations where ACME server policy
    allows certificates to be issued for any subdomain subordinate
    to the domain specified in the 'identifier' field of the
    authorization object.

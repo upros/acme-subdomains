@@ -287,9 +287,9 @@ In the following example newOrder payload, the client requests a certificate for
 
 If the client is unable to fulfill authorizations against an ancestor domain, the client should not include the "ancestorDomain" field.
 
-Server newOrder handling generally follows the process documented in ACME, {{Section 7.4 of RFC8555}}. If the server is willing to allow subdomain authorizations for the domain specified in "parentDomain", then it creates an authorization object against that parent domain and includes the "subdomainAuthAllowed" flag with a value of true.
+Server newOrder handling generally follows the process documented in ACME, {{Section 7.4 of RFC8555}}. If the server is willing to allow subdomain authorizations for the domain specified in "ancestorDomain", then it creates an authorization object against that ancestor domain and includes the "subdomainAuthAllowed" flag with a value of true.
 
-If the server policy does not allow creation of subdomain authorizations against that parent domain, then it can create an authorization object for the indicated identifier value, and SHOULD NOT include the "subdomainAuthAllowed" flag. As the client requested a subdomain authorization for the parent domain, and not for the indicated identifier, there is no need for the server to include the "subdomainAuthAllowed" flag in the authorization object for the indicated identifier.
+If the server policy does not allow creation of subdomain authorizations against that ancestor domain, then it can create an authorization object for the indicated identifier value, and SHOULD NOT include the "subdomainAuthAllowed" flag. As the client requested a subdomain authorization for the ancestor domain, and not for the indicated identifier, there is no need for the server to include the "subdomainAuthAllowed" flag in the authorization object for the indicated identifier.
 
 ## Directory Object Metadata
 
@@ -604,9 +604,9 @@ Therefore, all Security Considerations in ACME in the following areas are equall
 
 - CA Policy Considerations
 
-The only exception is that in order to satisfy goal (1) above, this draft assumes that control over a domain implies control over a subdomain, and therefore authorization for certificate issuance for the former implies authorization for certificate issuance for the latter.  In many ecosystems, this is a safe assumption, especially because control over the domain can often be leveraged to successfully demonstrate control over subdomains anyway, for example by temporarily modifying DNS for the subdomain to point to a server the parent domain owner controls, rendering the distinction moot.  For example, the CA/Browser Forum Baseline Requirements considers control of the parent domain sufficient for issuance of certificates for subdomains.
+The only exception is that in order to satisfy goal (1) above, this draft assumes that control over a domain implies control over a subdomain, and therefore authorization for certificate issuance for the former implies authorization for certificate issuance for the latter.  In many ecosystems, this is a safe assumption, especially because control over the domain can often be leveraged to successfully demonstrate control over subdomains anyway, for example by temporarily modifying DNS for the subdomain to point to a server the ancestor domain owner controls, rendering the distinction moot.  For example, the CA/Browser Forum Baseline Requirements considers control of an ancestor domain sufficient for issuance of certificates for subdomains.
 
-In ecosystems where control of a parent domain may not imply control over subdomains or authorization for issuance of certificates for subdomains, a more complicated threat analysis and server policy might be needed.
+In ecosystems where control of an ancestor domain may not imply control over subdomains or authorization for issuance of certificates for subdomains, a more complicated threat analysis and server policy might be needed.
 
 Some additional comments on ACME server policy are given later in this section.
 

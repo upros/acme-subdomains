@@ -112,7 +112,7 @@ The following additional terms are used in this document:
 
 - CSR: Certificate Signing Request as defined in {{?RFC2986}}
 
-- Ancestor Domain: a domain is an ancestor domain of a subdomain if it contains that subdomain, as per the {{!RFC8499}} definition of subdomain. For example, for the host name "nnn.mmm.example.com", both "mmm.example.com" and "example.com" are ancestor domains of "nnn.mmm.example.com". Note that the comparisons here are done on whole labels; that is, "oo.example.com" is not an ancestor domain of "ooo.example.com"
+- Ancestor Domain: a domain is an ancestor domain of a subdomain if it contains that subdomain and has less labels than that subdomain. A domain cannot be an ancestor domain of itself. For example, for the host name "nnn.mmm.example.com", both "mmm.example.com" and "example.com" are ancestor domains of "nnn.mmm.example.com". However, "nnn.mmm.example.com" is not an ancestor domain of  "nnn.mmm.example.com". Note that the comparisons here are done on whole labels; that is, "oo.example.com" is not an ancestor domain of "ooo.example.com".
 
 ACME {{!RFC8555}} defines the following object types which are used in this document:
 

@@ -289,7 +289,7 @@ If the client is unable to fulfill authorizations against an ancestor domain, th
 
 Server newOrder handling generally follows the process documented in ACME, {{Section 7.4 of RFC8555}}. If the server is willing to allow subdomain authorizations for the domain specified in "parentDomain", then it creates an authorization object against that parent domain and includes the "subdomainAuthAllowed" flag with a value of true.
 
-If the server policy does not allow creation of subdomain authorizations against that parent domain, then it can create an authorization object for the indicated identifier value, and SHOULD NOT include the "subdomainAuthAllowed" flag. As the client requested a subdomain authorization for the parent domain, and not for the indiciated identifier, there is no need for the server to include the "subdomainAuthAllowed" flag in the authorization object for the indicated identifier.
+If the server policy does not allow creation of subdomain authorizations against that parent domain, then it can create an authorization object for the indicated identifier value, and SHOULD NOT include the "subdomainAuthAllowed" flag. As the client requested a subdomain authorization for the parent domain, and not for the indicated identifier, there is no need for the server to include the "subdomainAuthAllowed" flag in the authorization object for the indicated identifier.
 
 ## Directory Object Metadata
 
@@ -578,7 +578,7 @@ The following field is added to the "ACME Directory Metadata Fields" registry de
 
 # Security Considerations
 
-This document documents enhancements to ACME {{!RFC8555}} that optimize the protocol flows for issuance of certificates for subdomains. The underlying goal of ACME for Subdomains remains the same as that of ACME: managing certificates that attest to identifier/key bindings for these subdomains. Thus, ACME for Subdomains has the same two security goals as ACME:
+This document specifies enhancements to ACME {{!RFC8555}} that optimize the protocol flows for issuance of certificates for subdomains. The underlying goal of ACME for Subdomains remains the same as that of ACME: managing certificates that attest to identifier/key bindings for these subdomains. Thus, ACME for Subdomains has the same two security goals as ACME:
 
 1. Only an entity that controls an identifier can get an authorization for that identifier
 

@@ -610,6 +610,11 @@ In ecosystems where control of an ancestor domain may not imply control over sub
 
 Some additional comments on ACME server policy are given later in this section.
 
+## Client Account Security
+
+There may be scenarios were a client wishes to deactivate an authorization object for an ancestor domain, or deactivate its account completely. For example, a client may want to do this if an account key is compromised, or if a authorization object covering domains subordinate to an ancestor domain is no longer needed. The client can deactivate an authorization using the mechanism specified in {{!RFC8555, Section 7.5.2}} and can deactivate an account using the mechanism specified in {{!RFC8555, Section 7.3.6}}.
+
+
 ## Subdomain Determination
 
 The {{!RFC8499}} definition of a subdomain is reproduced in {{terminology}}. When comparing domains to determine if one is a subdomain of the other, it is important to compare entire labels, and not rely on a string prefix match. Relying on string prefix matches may yield incorrect results.

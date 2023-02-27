@@ -212,6 +212,8 @@ The following example shows an authorization object for the domain `example.org`
 
 If the "subdomainAuthAllowed" field is not included, then the assumed default value is false.
 
+If ACME server policy allows issuance of certificates containing wildcard identifiers under that authorization object, then the server SHOULD include the "wildcard" field with a value of true, as per {{!RFC8555, Section 7.1.4}}.
+
 ## Pre-Authorization
 
 The basic ACME workflow has authorization objects created reactively in response to a certificate order. ACME also allows for pre-authorization, where clients obtain authorization for an identifier proactively, outside of the context of a specific issuance. With the ACME pre-authorization flow, a client can pre-authorize for a domain once, and then issue multiple newOrder requests for certificates with identifiers in the subdomains subordinate to that domain.

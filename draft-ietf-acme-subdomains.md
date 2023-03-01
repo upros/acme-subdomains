@@ -47,13 +47,13 @@ informative:
     title: Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates
     target: https://cabforum.org/baseline-requirements-documents/
 
-ACME Identifier Types:
+  ACME-Identifier-Types:
     author:
       org: IANA
     title: ACME Identifier Types
     target: https://www.iana.org/assignments/acme/acme.xhtml#acme-identifier-types
 
-ACME Validation Methods:
+  ACME-Validation-Methods:
     author:
       org: IANA
     title: ACME Validation Methods
@@ -158,9 +158,9 @@ ACME places the following restrictions on "identifiers":
 
 ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in authorization objects.
 
-The base ACME {{!RFC8555}} document only specifies the "dns" identifier type. Additional identifiers may be defined and registered in the IANA [ACME Identifier Types] registry. For example, {{?RFC8738}} specifies the "ip" identifier type. This document is only relevant for the "dns" identifier type.
+The base ACME {{!RFC8555}} document only specifies the "dns" identifier type. Additional identifiers may be defined and registered in the IANA {{ACME-Identifier-Types}} registry. For example, {{?RFC8738}} specifies the "ip" identifier type. This document is only relevant for the "dns" identifier type.
 
-Note also that ACME supports multiple different validation methods that can be used to fulfill challenges and prove ownership of identifiers. Validation methods are registered in the IANA [ACME Validation Methods] registry. This document does not mandate use of any particular validation method or methods. ACME server policy dictates which validation methods are supported. See {{acme-server-policy-considerations}} for more information on ACME server policy.
+Note also that ACME supports multiple different validation methods that can be used to fulfill challenges and prove ownership of identifiers. Validation methods are registered in the IANA {{ACME-Validation-Methods}} registry. This document does not mandate use of any particular validation method or methods. ACME server policy dictates which validation methods are supported. See {{acme-server-policy-considerations}} for more information on ACME server policy.
 
 # ACME Issuance of Subdomain Certificates
 

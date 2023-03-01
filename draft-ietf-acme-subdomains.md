@@ -632,4 +632,18 @@ ACME server policy could specify whether:
 
 - DNS based proof of ownership, or HTTP based proof of ownership, or both, are allowed
 
+The CA policy considerations listed in {{!RFC8555, Section 10.5}} are equally applicable here. These include, but are not limited to:
+
+- Is the claimed identifier syntactically valid?
+
+-  For domain names:
+
+  -  Is the name on the Public Suffix List?
+
+  -  Is the name a high-value name?
+
+- Is the key in the CSR sufficiently strong?
+
+Refer to {{!RFC8555, Section 10.5}} for more CA policy considerations.
+
 ACME server policy specification is explicitly out of scope of this document.

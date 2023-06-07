@@ -156,7 +156,7 @@ ACME places the following restrictions on "identifiers":
 
 - {{!RFC8555, Section 8.4}}: the "identifier", or FQDN, in the authorization object must be used when fulfilling challenges via DNS: "The client constructs the validation domain name by prepending the label "_acme-challenge" to the domain name being validated."
 
-ACME does not mandate that the "identifier" in a newOrder request matches the "identifier" in authorization objects.
+ACME does not mandate that the "identifier" in a newOrder request match the "identifier" in authorization objects.
 
 The base ACME {{!RFC8555}} document only specifies the "dns" identifier type. Additional identifiers may be defined and registered in the IANA {{ACME-Identifier-Types}} registry. For example, {{?RFC8738}} specifies the "ip" identifier type. This document is only relevant for the "dns" identifier type.
 
@@ -164,7 +164,7 @@ Note also that ACME supports multiple different validation methods that can be u
 
 # ACME Issuance of Subdomain Certificates
 
-As noted in the previous section, ACME {{!RFC8555}} does not mandate that the "identifier" in a newOrder request matches the "identifier" in authorization objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain.
+As noted in the previous section, ACME {{!RFC8555}} does not mandate that the "identifier" in a newOrder request match the "identifier" in authorization objects. This means that the ACME specification does not preclude an ACME server processing newOrder requests and issuing certificates for a subdomain without requiring a challenge to be fulfilled against that explicit subdomain.
 
 ACME server policy could allow issuance of certificates for a subdomain to a client where the client only has to fulfill an authorization challenge for an ancestor domain of that subdomain. This allows a flow where a client proves ownership of, for example, "example.org" and then successfully obtains a certificate for "sub.example.org".
 
